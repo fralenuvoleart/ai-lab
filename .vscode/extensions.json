@@ -1,7 +1,5 @@
 {
   "recommendations": [
-    "rooveterinaryinc.roo-cline",
-    "ms-vscode-remote.remote-ssh",
     "ms-azuretools.vscode-docker"
   ]
 }

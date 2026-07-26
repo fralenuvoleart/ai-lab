@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-AI-LAB workspace initialization — mono-repo scaffolded with shared infrastructure (Caddy, PostgreSQL/pgvector, Qdrant), experiment templates, and DevOps tooling.
+AI-LAB deployed on Hetzner VPS with shared infrastructure running (Caddy, PostgreSQL/pgvector, Qdrant). Ready for experiment development.
 
 ## Recent Changes
 
@@ -13,3 +13,10 @@ AI-LAB workspace initialization — mono-repo scaffolded with shared infrastruct
   - Scaffolded experiment templates (`_template/`, `openclaw-agent/`, `multi-agent-crew/`)
   - Added DevOps scripts (`deploy.sh`, `backup-db.sh`) and `Makefile`
   - Documented workspace structure in `docs/WORKSPACE-STRUCTURE.md`
+- **2026-07-26**: Hetzner server fully deployed:
+  - Server: **AI-LAB** — `167.233.42.140` (CX23, 2 vCPU, 4 GB RAM, 40 GB, Ubuntu 26.04, Nuremberg)
+  - Docker 29.6.2 installed with compose plugin
+  - Workspace rsync'd to `/opt/ai-lab`
+  - All infra containers running: Caddy (:80/:443), PostgreSQL (:5432, healthy), Qdrant (:6333/:6334)
+  - SSH key `~/.ssh/id_ed25519` active for root access
+  - HCLOUD_TOKEN stored in `.env`
