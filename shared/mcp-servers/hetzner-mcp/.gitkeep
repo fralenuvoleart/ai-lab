@@ -1,0 +1,4 @@
+# Place custom MCP servers for Hetzner Cloud integration here.
+# See: https://modelcontextprotocol.io/docs/concepts/server
+
+# Example: Hetzner MCP server for managing Hetzner cloud resources (VPS, DNS, etc.)

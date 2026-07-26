@@ -1,0 +1,25 @@
+# ==============================================================================
+# Experiment: {{PROJECT_NAME}}
+# ==============================================================================
+
+services:
+  app:
+    build: .
+    container_name: ailab-{{project-name}}
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: development
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - shared
+    env_file:
+      - .env
+
+networks:
+  shared:
+    name: ailab-shared
+    external: true

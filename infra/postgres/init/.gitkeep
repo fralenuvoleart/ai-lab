@@ -1,0 +1,3 @@
+-- Place PostgreSQL initialization scripts here (.sql, .sh)
+-- They will run automatically on first database creation.
+-- Example: CREATE EXTENSION IF NOT EXISTS vector;

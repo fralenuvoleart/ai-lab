@@ -1,0 +1,4 @@
+# Place custom MCP servers for Docker management here.
+# See: https://modelcontextprotocol.io/docs/concepts/server
+
+# Example: Docker MCP server for managing containers, images, and volumes.

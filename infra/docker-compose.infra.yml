@@ -1,0 +1,81 @@
+# ==============================================================================
+# Shared Infrastructure — Always-On Services
+# Start with: docker compose -f infra/docker-compose.infra.yml up -d
+# ==============================================================================
+
+services:
+  # --- Reverse Proxy (Auto-SSL) ---
+  caddy:
+    image: caddy:2-alpine
+    container_name: ailab-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - shared
+    env_file:
+      - ../.env
+
+  # --- Shared PostgreSQL ---
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: ailab-postgres
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ailab}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+      POSTGRES_DB: ${POSTGRES_DB:-ailab}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - shared
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ailab}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --- Shared Qdrant Vector DB ---
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: ailab-qdrant
+    restart: unless-stopped
+    ports:
+      - "${QDRANT_REST_PORT:-6333}:6333"
+      - "${QDRANT_GRPC_PORT:-6334}:6334"
+    environment:
+      QDRANT__SERVICE__API_KEY: ${QDRANT_API_KEY:-}
+    volumes:
+      - qdrant_storage:/qdrant/storage
+      - ./qdrant/config:/qdrant/config:ro
+    networks:
+      - shared
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:6333/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  caddy_data:
+    name: ailab-caddy-data
+  caddy_config:
+    name: ailab-caddy-config
+  postgres_data:
+    name: ailab-postgres-data
+  qdrant_storage:
+    name: ailab-qdrant-storage
+
+networks:
+  shared:
+    name: ailab-shared
+    driver: bridge

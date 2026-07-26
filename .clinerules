@@ -1,0 +1,37 @@
+# Global AI Behavior Rules (Roo Code)
+
+## Architectural Scope
+- This is a mono-repo AI lab with multiple isolated experiments.
+- `infra/` contains shared always-on services (reverse proxy, databases).
+- `projects/` contains isolated experiments, each with its own docker-compose.yml.
+- `shared/` contains reusable assets across experiments.
+- `scripts/` contains DevOps and maintenance utilities.
+- **Critical:** Do NOT modify files in `infra/` when working on an isolated project in `projects/` unless explicitly asked. Shared services are off-limits to individual experiments.
+
+## File Creation Rules
+- New experiments MUST be scaffolded from `projects/_template/`.
+- All API keys and secrets go in `.env` files, NEVER hardcoded.
+
+## Secret Management
+- Never write plain-text API keys, tokens, or passwords into source files.
+- Reference variables from the root `.env` file or project-specific `.env` files.
+- Use `${VAR_NAME}` syntax in docker-compose files, never hardcoded values.
+
+## Execution Safety
+- Before executing shell commands, verify whether you are operating locally or on the remote Hetzner server.
+- Prefer modifying `docker-compose` files over running manual one-off terminal tweaks.
+- Always prefer `docker compose` (v2 plugin) over `docker-compose` (v1).
+- Never run destructive commands (`rm -rf`, `docker system prune -a`) without confirmation.
+- Never delete production data without confirmation.
+
+## Coding Standards
+- JavaScript/TypeScript: 2-space indentation, semicolons, single quotes.
+- Python: Black formatter, 4-space indentation, type hints required.
+- Shell scripts: `set -euo pipefail` at the top of every script.
+- Dockerfiles: Multi-stage builds, non-root user, `.dockerignore` required.
+- Markdown: 2-space indentation, no trailing whitespace.
+
+## Git Conventions
+- Commit messages: present tense, imperative mood ("Add feature" not "Added feature").
+- Branch naming: `feature/`, `fix/`, `experiment/` prefixes.
+- No committing `.env` files, `.log` files, or database storage directories.

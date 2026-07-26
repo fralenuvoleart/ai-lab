@@ -1,0 +1,22 @@
+# Caddy Reverse Proxy — Auto-SSL for all services
+# Reload config: docker compose -f infra/docker-compose.infra.yml exec -w /etc/caddy caddy caddy reload
+
+{
+    # Global options
+    email {$CADDY_ACME_EMAIL:admin@localhost}
+    admin off
+}
+
+# Default catch-all (responds 404 for unmatched domains)
+:80, :443 {
+    respond "AI-LAB Gateway" 200
+}
+
+# Experiment subdomains get proxied here.
+# Example:
+# myapp.localhost {
+#     reverse_proxy ailab-myapp:3000
+# }
+
+# Import per-project Caddy configs (optional)
+# import infra/caddy/sites/*

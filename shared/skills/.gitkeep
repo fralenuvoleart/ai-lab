@@ -1,0 +1,7 @@
+# Shared Skills
+
+Place reusable Roo Code skill files (SKILL.md) here. Skills provide
+specialized prompt templates and instructions that can be loaded
+into Roo Code sessions.
+
+Example: `my-custom-skill/SKILL.md`

@@ -1,0 +1,6 @@
+# Shared Datasets
+
+Place sample documents, evaluation datasets, and test corpora here
+for RAG experiments and testing.
+
+Supported formats: .txt, .md, .pdf, .json, .jsonl, .csv

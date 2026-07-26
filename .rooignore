@@ -1,0 +1,58 @@
+# Exclude heavy DB volumes & build files
+infra/postgres/
+infra/qdrant/
+**/node_modules/
+**/venv/
+**/.venv/
+**/*.sqlite
+**/*.log
+
+# Security & Secrets
+**/.env
+**/.env.local
+**/secrets/
+
+# Sensitive files — never read or index
+.env
+*.env
+*.env.local
+*.env.production
+*.pem
+*.key
+*secret*
+*credential*
+id_rsa*
+*.p12
+*.pfx
+
+# Heavy data directories — skip for performance
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Database & vector storage (large binary files)
+infra/postgres/data/
+infra/qdrant/storage/
+*.db
+*.sqlite
+
+# Git internals
+.git/
+
+# Logs
+*.log
+logs/
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Large media/archives
+*.zip
+*.tar.gz
+*.tgz
+*.mp4
+*.avi
+*.mov

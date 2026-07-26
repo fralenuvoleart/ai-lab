@@ -1,0 +1,31 @@
+# ==============================================================================
+# OpenClaw Agent — Experiment
+# ==============================================================================
+
+services:
+  openclaw:
+    image: ghcr.io/your-org/openclaw:latest
+    container_name: ailab-openclaw
+    restart: unless-stopped
+    ports:
+      - "${OPENCLAW_PORT:-8080}:8080"
+    environment:
+      OPENCLAW_SOUL: /app/SOUL.md
+      OPENCLAW_MEMORY: /app/MEMORY.md
+    volumes:
+      - ./SOUL.md:/app/SOUL.md:ro
+      - ./MEMORY.md:/app/MEMORY.md
+      - openclaw_data:/app/data
+    networks:
+      - shared
+    env_file:
+      - .env
+
+volumes:
+  openclaw_data:
+    name: ailab-openclaw-data
+
+networks:
+  shared:
+    name: ailab-shared
+    external: true
