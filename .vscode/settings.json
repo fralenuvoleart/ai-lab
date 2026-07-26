@@ -1,0 +1,71 @@
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "files.associations": {
+    "*.clinerules": "markdown",
+    ".rooignore": "ignore"
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/__pycache__": true,
+    "**/.venv": true,
+    "**/venv": true,
+    "**/*.pyc": true,
+    "**/.DS_Store": true,
+    "infra/postgres/data": true,
+    "infra/qdrant/storage": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/__pycache__": true,
+    "**/.venv": true,
+    "**/venv": true,
+    "**/qdrant/storage": true,
+    "**/postgres/data": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/__pycache__/**": true,
+    "**/qdrant/storage/**": true,
+    "**/postgres/data/**": true
+  },
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.shellIntegration.enabled": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one"
+  },
+  "roo-cline.allowedCommands": [
+    "docker",
+    "docker-compose",
+    "make",
+    "rsync",
+    "ssh",
+    "curl",
+    "git",
+    "node",
+    "npm",
+    "npx",
+    "python",
+    "python3",
+    "pip",
+    "bash",
+    "chmod"
+  ],
+  "remote.SSH.connectTimeout": 30,
+  "remote.SSH.defaultExtensions": [
+    "rooveterinaryinc.roo-cline",
+    "ms-vscode-remote.remote-ssh"
+  ]
+}

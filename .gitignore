@@ -24,7 +24,6 @@ out/
 *.swp
 *.swo
 *~
-.vscode/settings.json
 !.vscode/extensions.json
 
 # OS
