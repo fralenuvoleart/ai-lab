@@ -18,5 +18,10 @@
 #     reverse_proxy ailab-myapp:3000
 # }
 
+# Open WebUI
+ai.fralenuvole.art {
+    reverse_proxy ailab-open-webui:8080
+}
+
 # Import per-project Caddy configs (optional)
 # import infra/caddy/sites/*

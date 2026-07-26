@@ -29,6 +29,8 @@ rsync -avz --delete \
     --exclude='*.log' \
     --exclude='infra/postgres/data/' \
     --exclude='infra/qdrant/storage/' \
+    --exclude='projects/*/data/' \
+    --exclude='shared/venv-*/' \
     "$(dirname "$0")/../" \
     "${REMOTE_USER}@${TARGET}:${REMOTE_PATH}"
 

@@ -59,6 +59,10 @@ infra/qdrant/storage/
 *.sqlite
 *.sqlite3
 
+# Scraped datasets (derived data, regeneratable)
+shared/datasets/scraped/
+shared/venv-*/
+
 # Backups
 backups/
 
