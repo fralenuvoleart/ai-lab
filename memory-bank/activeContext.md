@@ -24,3 +24,7 @@ AI-LAB deployed on Hetzner VPS with shared infrastructure running (Caddy, Postgr
   - All infra containers running: Caddy (:80/:443), PostgreSQL (:5432, healthy), Qdrant (:6333/:6334)
   - SSH key `~/.ssh/id_ed25519` active for root access
   - HCLOUD_TOKEN stored in `.env`
+- **2026-07-27**: Fixed Open WebUI Ollama connection:
+  - Added `extra_hosts: host.docker.internal:host-gateway` to docker-compose (Linux doesn't resolve this DNS name by default)
+  - Added commented-out Ollama container service as alternative to host-installed Ollama
+  - Added `WHISPER_LANG=en` env var to force English STT (Whisper base model misdetected as Spanish)

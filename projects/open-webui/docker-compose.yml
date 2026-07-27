@@ -12,10 +12,19 @@ services:
       - "127.0.0.1:${WEBUI_PORT:-3000}:8080"
     volumes:
       - ./data:/app/backend/data
+    # Resolve host.docker.internal on Linux so Ollama connections work
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY}
       WEBUI_AUTH: "true"
       ENABLE_SIGNUP: ${ENABLE_SIGNUP:-false}
+      # API keys for programmatic access (Settings → Account → API Keys)
+      ENABLE_API_KEYS: "true"
+      # Show $ cost per message (set per-model pricing in Admin → Settings → Models)
+      SHOW_COST_IN_CHAT: "true"
+      # STT: force English to prevent misdetection (e.g. Spanish)
+      WHISPER_LANG: en
       # RAG: API-based embeddings (offloads CPU from VPS)
       RAG_EMBEDDING_ENGINE: openai
       RAG_EMBEDDING_MODEL: ${RAG_EMBEDDING_MODEL:-openai/text-embedding-3-small}
@@ -29,7 +38,31 @@ services:
     env_file:
       - .env
 
+  # Optional: Run Ollama alongside Open WebUI (instead of on the host).
+  # Uncomment if you prefer containerized Ollama. Set OLLAMA_BASE_URL
+  # in Open WebUI Admin → Connections → Ollama to: http://ollama:11434
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: ailab-ollama
+  #   restart: unless-stopped
+  #   ports:
+  #     - "127.0.0.1:11434:11434"
+  #   volumes:
+  #     - ollama_data:/root/.ollama
+  #   environment:
+  #     OLLAMA_HOST: "0.0.0.0"
+  #   networks:
+  #     - shared
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 2g
+
 networks:
   shared:
     name: ailab-shared
     external: true
+
+# volumes:
+#   ollama_data:
+#     name: ailab-ollama-data
