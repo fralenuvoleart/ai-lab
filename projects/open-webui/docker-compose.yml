@@ -21,6 +21,7 @@ services:
       ENABLE_SIGNUP: ${ENABLE_SIGNUP:-false}
       # API keys for programmatic access (Settings → Account → API Keys)
       ENABLE_API_KEYS: "true"
+      USER_PERMISSIONS_FEATURES_API_KEYS: "true"
       # Show $ cost per message (set per-model pricing in Admin → Settings → Models)
       SHOW_COST_IN_CHAT: "true"
       # STT: force English to prevent misdetection (e.g. Spanish)
