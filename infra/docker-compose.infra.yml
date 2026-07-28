@@ -44,27 +44,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # --- Shared Qdrant Vector DB ---
-  qdrant:
-    image: qdrant/qdrant:latest
-    container_name: ailab-qdrant
-    restart: unless-stopped
-    ports:
-      - "${QDRANT_REST_PORT:-6333}:6333"
-      - "${QDRANT_GRPC_PORT:-6334}:6334"
-    environment:
-      QDRANT__SERVICE__API_KEY: ${QDRANT_API_KEY:-}
-    volumes:
-      - qdrant_storage:/qdrant/storage
-      - ./qdrant/config:/qdrant/config:ro
-    networks:
-      - shared
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q -O - http://localhost:6333/healthz || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
 volumes:
   caddy_data:
     name: ailab-caddy-data
@@ -72,8 +51,6 @@ volumes:
     name: ailab-caddy-config
   postgres_data:
     name: ailab-postgres-data
-  qdrant_storage:
-    name: ailab-qdrant-storage
 
 networks:
   shared:

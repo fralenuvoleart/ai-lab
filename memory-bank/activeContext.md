@@ -21,7 +21,7 @@ AI-LAB deployed on Hetzner VPS with shared infrastructure running (Caddy, Postgr
   - Server: **AI-LAB** — `167.233.42.140` (CX23, 2 vCPU, 4 GB RAM, 40 GB, Ubuntu 26.04, Nuremberg)
   - Docker 29.6.2 installed with compose plugin
   - Workspace rsync'd to `/opt/ai-lab`
-  - All infra containers running: Caddy (:80/:443), PostgreSQL (:5432, healthy), Qdrant (:6333/:6334)
+  - All infra containers running: Caddy (:80/:443), PostgreSQL (:5432, healthy)
   - SSH key `~/.ssh/id_ed25519` active for root access
   - HCLOUD_TOKEN stored in `.env`
 - **2026-07-27**: Fixed Open WebUI Ollama connection:
