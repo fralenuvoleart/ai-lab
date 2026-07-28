@@ -30,3 +30,12 @@ AI-LAB deployed on Hetzner VPS with shared infrastructure running (Caddy, Postgr
   - Added `WHISPER_LANG=en` env var to force English STT (Whisper base model misdetected as Spanish)
 - **2026-07-27**: Open WebUI updated to v0.11.0 — pulled latest `ghcr.io/open-webui/open-webui:main` (digest `6a773e5`) and recreated container on Hetzner
 - **2026-07-27**: OpenSERP web search deployed — `karust/openserp:latest` container added to docker-compose, `OPENSERP_BASE_URL` env var configured. DuckDuckGo works; Google may CAPTCHA-block datacenter IPs. 6 engines available, no API keys needed.
+- **2026-07-28**: Basic Memory MCP server deployed for Open WebUI:
+  - Installed `basic-memory` v0.22.1 via pipx (Python 3.14.4)
+  - Architecture: Open WebUI → MCP Streamable HTTP → basic-memory (direct, no adapters)
+  - Vault directory: `/data/vault/` (Personal/ + Projects/ subdirectories)
+  - Runs as `basic-memory.service` (systemd), MCP on port `8000`
+  - Built-in semantic search: fastembed + bge-small-en-v1.5, SQLite backend
+  - 23 MCP tools: write_note, search_notes, build_context, edit_note, delete_note, read_note, list_directory, move_note, etc.
+  - Open WebUI config: Admin → External Tools → MCP (Streamable HTTP) → `http://host.docker.internal:8000/mcp`
+  - 157 MB RAM usage, auto-restarts on failure

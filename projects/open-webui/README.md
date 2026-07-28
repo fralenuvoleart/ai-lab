@@ -48,6 +48,63 @@ ai.yourdomain.com {
 
 Then reload Caddy: `make proxy-reload` from the workspace root.
 
+## Memory Server (Basic Memory via MCP)
+
+Open WebUI connects to [`basic-memory`](https://github.com/basicmachines-co/basic-memory) — a local-first knowledge engine that stores memories as `.md` files on the VPS at `/data/vault/`. Uses Open WebUI's **native MCP (Streamable HTTP)** integration — no adapters needed.
+
+**Status**: Running as `basic-memory.service` (systemd), MCP on port `8000`.
+
+### Connect in Open WebUI
+
+1. Go to **Admin Panel → Settings → External Tools** (not Tools)
+2. Click **+ Add**:
+   - **Type**: `MCP (Streamable HTTP)`
+   - **Name**: `Basic Memory`
+   - **URL**: `http://host.docker.internal:8000/mcp`
+3. Tools auto-discover — `write_note`, `search_notes`, `build_context`, `edit_note`, `delete_note`, `read_note`, `list_directory`, `move_note`, and more
+
+### Enable Per-Model
+
+1. **Admin Panel → Settings → Models** → edit your model
+2. Toggle **Memory** to **OFF** (this is Open WebUI's built-in memory — conflicts with basic-memory)
+3. Under **Tools**, enable **"Basic Memory"**
+4. Save — now every chat with that model uses basic-memory exclusively
+
+### Architecture
+
+```
+Open WebUI (Docker) ──MCP Streamable HTTP──▶ basic-memory (:8000)
+                                                    │
+                                            /data/vault/
+                                            ├── Personal/
+                                            └── Projects/
+```
+
+### System Prompt for Auto-Memory
+
+Add to your model's system prompt (**Admin → Settings → Models → edit model**):
+
+> **Memory**: Use `write_note` to save facts and `search_notes` to retrieve them. Do NOT use `update_memory` or `read_memory_path` — those are a different system. Store personal info under the `Personal/` folder and project notes under `Projects/`. Before answering questions about the user, always check memory first with `search_notes`.
+
+⚠️ Open WebUI has its own built-in memory (`update_memory`/`read_memory_path`) that the model may pick instead. The explicit tool names in the prompt prevent this conflict.
+
+### Manual Vault Access
+
+```bash
+ssh hetzner-ailab
+ls /data/vault/Personal/   # Personal memories
+ls /data/vault/Projects/   # Project-specific notes
+vim /data/vault/Personal/preferences.md  # Edit directly
+```
+
+### Service Management
+
+```bash
+systemctl status basic-memory     # Check status
+systemctl restart basic-memory    # Restart after config changes
+journalctl -u basic-memory -f     # Tail logs
+```
+
 ## Notes
 
 - **Data**: All chats, users, and settings persist in `./data/` (excluded from rsync deploys — back up separately)

@@ -2,6 +2,7 @@
 
 ## Completed
 
+- [x] **2026-07-28**: Basic Memory MCP server deployed — `basic-memory` v0.22.1 via pipx, vault at `/data/vault/`, systemd service on port 8000, SSE transport, built-in semantic search (fastembed/bge-small-en-v1.5). Open WebUI configured to connect at `http://host.docker.internal:8000/mcp`.
 - [x] **2026-07-27**: OpenSERP web search deployed — `karust/openserp:latest` container, `OPENSERP_BASE_URL` configured, DuckDuckGo verified working
 - [x] **2026-07-27**: Open WebUI updated to v0.11.0 — pulled `ghcr.io/open-webui/open-webui:main`, recreated container on Hetzner
 - [x] **2026-07-27**: Open WebUI Ollama fix deployed — `host.docker.internal` resolution, Ollama installed on VPS, `llama3.2:1b` + `gemma2:2b` pulled
