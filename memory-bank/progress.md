@@ -2,6 +2,8 @@
 
 ## Completed
 
+- [x] **2026-07-27**: OpenSERP web search deployed — `karust/openserp:latest` container, `OPENSERP_BASE_URL` configured, DuckDuckGo verified working
+- [x] **2026-07-27**: Open WebUI updated to v0.11.0 — pulled `ghcr.io/open-webui/open-webui:main`, recreated container on Hetzner
 - [x] **2026-07-27**: Open WebUI Ollama fix deployed — `host.docker.internal` resolution, Ollama installed on VPS, `llama3.2:1b` + `gemma2:2b` pulled
 - [x] **2026-07-26**: Workspace scaffolded — directory structure, VS Code config, custom Roo modes, shared infra, experiment templates, DevOps scripts, Makefile
 - [x] **2026-07-26**: Hetzner VPS fully deployed — Docker installed, workspace rsync'd, all infra containers running (Caddy, PostgreSQL, Qdrant)

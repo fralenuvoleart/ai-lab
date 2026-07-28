@@ -33,36 +33,18 @@ services:
       # API providers — configure in UI (Admin → Settings → Connections)
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_API_BASE_URL: ${OPENAI_API_BASE_URL:-}
+      # Tavily web search (AI-optimized results)
+      ENABLE_WEB_SEARCH: ${ENABLE_WEB_SEARCH:-true}
+      WEB_SEARCH_ENGINE: ${WEB_SEARCH_ENGINE:-tavily}
+      WEB_SEARCH_RESULT_COUNT: ${WEB_SEARCH_RESULT_COUNT:-10}
+      WEB_LOADER_ENGINE: ${WEB_LOADER_ENGINE:-tavily}
+      TAVILY_API_KEY: ${TAVILY_API_KEY:-}
     networks:
       - shared
     env_file:
       - .env
 
-  # Optional: Run Ollama alongside Open WebUI (instead of on the host).
-  # Uncomment if you prefer containerized Ollama. Set OLLAMA_BASE_URL
-  # in Open WebUI Admin → Connections → Ollama to: http://ollama:11434
-  # ollama:
-  #   image: ollama/ollama:latest
-  #   container_name: ailab-ollama
-  #   restart: unless-stopped
-  #   ports:
-  #     - "127.0.0.1:11434:11434"
-  #   volumes:
-  #     - ollama_data:/root/.ollama
-  #   environment:
-  #     OLLAMA_HOST: "0.0.0.0"
-  #   networks:
-  #     - shared
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 2g
-
 networks:
   shared:
     name: ailab-shared
     external: true
-
-# volumes:
-#   ollama_data:
-#     name: ailab-ollama-data

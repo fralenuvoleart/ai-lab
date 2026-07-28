@@ -28,3 +28,5 @@ AI-LAB deployed on Hetzner VPS with shared infrastructure running (Caddy, Postgr
   - Added `extra_hosts: host.docker.internal:host-gateway` to docker-compose (Linux doesn't resolve this DNS name by default)
   - Added commented-out Ollama container service as alternative to host-installed Ollama
   - Added `WHISPER_LANG=en` env var to force English STT (Whisper base model misdetected as Spanish)
+- **2026-07-27**: Open WebUI updated to v0.11.0 — pulled latest `ghcr.io/open-webui/open-webui:main` (digest `6a773e5`) and recreated container on Hetzner
+- **2026-07-27**: OpenSERP web search deployed — `karust/openserp:latest` container added to docker-compose, `OPENSERP_BASE_URL` env var configured. DuckDuckGo works; Google may CAPTCHA-block datacenter IPs. 6 engines available, no API keys needed.
