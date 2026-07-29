@@ -1,0 +1,801 @@
+{
+  "version": 1,
+  "auditMode": "standard",
+  "auth": {
+    "serverUrl": "https://auth.vivartanenterprises.dev",
+    "planCheckIntervalMs": 900000,
+    "refreshSkewSeconds": 120,
+    "pendingAuthTtlSeconds": 600
+  },
+  "agentIntegration": {
+    "detected": [
+      "Claude Code",
+      "Cline",
+      "Roo Code",
+      "Kilo Code / OpenCode",
+      "Continue.dev",
+      "GitHub Copilot",
+      "Aider"
+    ],
+    "injectedInto": [
+      ".anchr/start.md",
+      ".anchr/IMPL_TRACKER.md",
+      ".anchr/procedures.jsonl",
+      "AGENTS.md",
+      ".claude/CLAUDE.md",
+      ".claude/commands/anchr-start.md",
+      ".github/copilot-instructions.md",
+      ".clinerules",
+      ".roo/rules/anchr.md",
+      ".continuerules",
+      ".aider.conf.yml",
+      ".gitignore",
+      ".claude/settings.json",
+      ".git/hooks/pre-commit"
+    ]
+  },
+  "audit": {
+    "domains": {
+      "CQ": {
+        "name": "Code Quality & Reliability",
+        "itemPrefix": "CQ",
+        "items": 14,
+        "itemCount": 14,
+        "enabled": true,
+        "coverage": [
+          "empty catch blocks",
+          "TODO/FIXME in production",
+          "dead code",
+          "unused imports",
+          "duplicate logic",
+          "resource leaks",
+          "unclosed connections",
+          "missing async cleanup",
+          "race conditions",
+          "deadlocks",
+          "missing idempotency",
+          "null guards",
+          "error boundaries",
+          "stub functions"
+        ]
+      },
+      "AI": {
+        "name": "AI / LLM Specific",
+        "itemPrefix": "AI",
+        "items": 16,
+        "itemCount": 16,
+        "enabled": true,
+        "coverage": [
+          "missing timeout",
+          "retry logic",
+          "fallback",
+          "cost control",
+          "prompt injection",
+          "output caching",
+          "graceful degradation",
+          "explainability",
+          "per-tenant toggle",
+          "usage metering",
+          "output validation",
+          "audit log",
+          "model version pinning",
+          "user transparency",
+          "prompt versioning",
+          "cost anomaly alerting"
+        ]
+      },
+      "DB": {
+        "name": "Database & Performance",
+        "itemPrefix": "DB",
+        "items": 15,
+        "itemCount": 15,
+        "enabled": true,
+        "coverage": [
+          "N+1 queries",
+          "full table scans",
+          "missing indexes",
+          "unparameterized queries",
+          "O(N²) algorithms",
+          "unbounded loops",
+          "missing cache",
+          "broken cache invalidation",
+          "missing CDN",
+          "blocking sync calls",
+          "missing exponential backoff",
+          "unbounded results",
+          "missing connection pooling",
+          "non-rollback-safe migrations",
+          "missing read replica"
+        ]
+      },
+      "SEC": {
+        "name": "Security",
+        "itemPrefix": "SEC",
+        "items": 24,
+        "itemCount": 24,
+        "enabled": true,
+        "coverage": [
+          "hardcoded secrets",
+          "input validation",
+          "output sanitization",
+          "SQL injection",
+          "XSS",
+          "CSRF",
+          "broken auth",
+          "missing RBAC",
+          "privilege escalation",
+          "IDOR",
+          "missing encryption at rest",
+          "weak encryption",
+          "TLS below 1.3",
+          "PII in logs",
+          "missing rate limiting on auth",
+          "session fixation",
+          "missing security headers",
+          "CVE dependencies",
+          "missing secrets rotation",
+          "JWT issues",
+          "MCP tool poisoning",
+          "supply chain compromise",
+          "missing pen test evidence",
+          "insufficient security logging"
+        ]
+      },
+      "AC": {
+        "name": "Audit & Compliance",
+        "itemPrefix": "AC",
+        "items": 16,
+        "itemCount": 16,
+        "enabled": true,
+        "coverage": [
+          "mutable audit log",
+          "broken SHA-256 chain",
+          "missing tenant isolation",
+          "missing SCIM",
+          "missing SSO/SAML",
+          "missing MFA",
+          "missing GDPR export",
+          "missing right-to-delete",
+          "missing retention policy",
+          "missing SOC2 evidence",
+          "missing HIPAA controls",
+          "missing DPA template",
+          "unversioned ToS",
+          "missing cookie consent",
+          "missing EU AI Act compliance",
+          "missing data residency enforcement"
+        ]
+      },
+      "OPS": {
+        "name": "Scalability & Operations",
+        "itemPrefix": "OPS",
+        "items": 14,
+        "itemCount": 14,
+        "enabled": true
+      },
+      "REL": {
+        "name": "Reliability & Resilience",
+        "itemPrefix": "REL",
+        "items": 8,
+        "itemCount": 8,
+        "enabled": true
+      },
+      "UX": {
+        "name": "UI / UX & Accessibility",
+        "itemPrefix": "UX",
+        "items": 12,
+        "itemCount": 12,
+        "enabled": true
+      },
+      "PLG": {
+        "name": "Growth & PLG",
+        "itemPrefix": "PLG",
+        "items": 12,
+        "itemCount": 12,
+        "enabled": true
+      },
+      "DX": {
+        "name": "Developer Experience & API",
+        "itemPrefix": "DX",
+        "items": 10,
+        "itemCount": 10,
+        "enabled": true
+      },
+      "OBS": {
+        "name": "Observability & Monitoring",
+        "itemPrefix": "OBS",
+        "items": 12,
+        "itemCount": 12,
+        "enabled": true
+      },
+      "AIN": {
+        "name": "AI-Native Product",
+        "itemPrefix": "AIN",
+        "items": 10,
+        "itemCount": 10,
+        "enabled": true
+      },
+      "ARC": {
+        "name": "Architecture & System Design",
+        "itemPrefix": "ARC",
+        "items": 16,
+        "itemCount": 16,
+        "enabled": true
+      },
+      "MAS": {
+        "name": "Multi-Agent & Agentic Systems",
+        "itemPrefix": "MAS",
+        "items": 10,
+        "itemCount": 10,
+        "enabled": true,
+        "coverage": [
+          "agent-to-agent authentication",
+          "permission isolation",
+          "goal consistency",
+          "sub-agent output verification",
+          "memory isolation",
+          "immutable action log",
+          "HITL bypass detection",
+          "autonomy escalation detection",
+          "supply chain integrity",
+          "cross-session goal drift detection"
+        ]
+      },
+      "PRV": {
+        "name": "Data Privacy & Sovereignty",
+        "itemPrefix": "PRV",
+        "items": 10,
+        "itemCount": 10,
+        "enabled": true,
+        "coverage": [
+          "PII inventory",
+          "data minimisation",
+          "consent management",
+          "right-to-access",
+          "right-to-deletion",
+          "data portability",
+          "cross-border transfer mechanisms",
+          "privacy by design",
+          "EU AI Act assessment",
+          "AI transparency notice"
+        ]
+      },
+      "TST": {
+        "name": "Testing & Quality Gates",
+        "itemPrefix": "TST",
+        "items": 10,
+        "itemCount": 10,
+        "enabled": true,
+        "coverage": [
+          "unit test coverage threshold",
+          "integration test coverage",
+          "end-to-end tests for critical journeys",
+          "load tests",
+          "SAST/DAST in CI",
+          "dependency vulnerability scan",
+          "no skipped tests without reason",
+          "test data isolation",
+          "mutation testing",
+          "contract tests"
+        ]
+      }
+    },
+    "totalDomains": 16,
+    "totalItems": 209,
+    "coverageEvidencePrefix": "DOMAIN-COVERAGE",
+    "enforceSelectionInEnterprise": true
+  },
+  "schema": {
+    "name": "anchr.config",
+    "version": "1.0.0",
+    "format": "json-compatible-yaml",
+    "parserRequirement": "Must parse with JSON.parse and Python json.load; no comments or anchors."
+  },
+  "product": {
+    "name": "Anchr",
+    "statusBar": {
+      "active": "$(eye) Anchr",
+      "hardStop": "$(error) Anchr STOP",
+      "stopped": "$(eye-closed) Anchr Off"
+    },
+    "commandPrefix": "anchr"
+  },
+  "paths": {
+    "root": ".",
+    "manifesto": "manifesto.md",
+    "config": "config.yml",
+    "tools": "anchr_tools.py",
+    "outDir": "out",
+    "signal": "out/signal.json",
+    "auditReport": "out/audit.rpt",
+    "planReport": "out/plan.rpt",
+    "sessionLog": "out/session.log",
+    "manifestOut": "out/manifest.out",
+    "deferLog": "out/defer.log",
+    "syncLog": "out/sync.log",
+    "webSources": "out/web_sources.jsonl",
+    "deployEvents": "out/deploy_events.jsonl",
+    "graphDb": "graph.db",
+    "graphManifest": "out/graph_manifest.json",
+    "graphParserCache": "out/graph_parser_cache",
+    "lock": "out/LOCK",
+    "heartbeat": "out/daemon.heartbeat"
+  },
+  "graph": {
+    "localModel": "qwen2.5-coder:3b",
+    "consistencyThreshold": 70,
+    "modelGatewayRequired": true,
+    "minimumConfidence": 0.7,
+    "tier4ChunkMaxChars": 6000
+  },
+  "webSourceVerification": {
+    "maxAgeSeconds": 86400,
+    "minimumClaimOverlap": 0.15,
+    "timeoutSeconds": 10,
+    "maxRedirects": 3,
+    "maxResponseBytes": 1048576
+  },
+  "modelGateway": {
+    "enabled": true,
+    "claimPatterns": [
+      "\\bllm\\b",
+      "\\bmodel call\\b",
+      "\\bmodel output\\b",
+      "\\bensemble\\b",
+      "\\bindependent verifier\\b",
+      "\\bgated_check\\b",
+      "GRAPH_BUILD.*--with-semantics",
+      "\\bsemantic generation\\b",
+      "\\bsemantic output\\b"
+    ],
+    "requiredEvidence": [
+      "model_call_reinjected",
+      "gated_check",
+      "independent_verifier"
+    ],
+    "lowConfidenceThreshold": 0.6,
+    "lowConfidenceEvidence": [
+      "pass1_result",
+      "pass2_status",
+      "pass3_decision"
+    ],
+    "componentSourceReadEvidence": "component_source_read"
+  },
+  "enforcement": {
+    "tier0_advisory": [
+      "manifesto_phrase_guidance",
+      "prompt_fragment_guidance",
+      "future_multi_agent_coordination_notes"
+    ],
+    "tier1_schema_forced": [
+      "agent_declaration",
+      "checklist_evidence",
+      "gate",
+      "rule_check",
+      "domain_confidence",
+      "locked_goal",
+      "semantic_success"
+    ],
+    "tier2_mechanical": [
+      "LOCK",
+      "signal_schema_validator",
+      "git_scope_guard",
+      "line_verify",
+      "signal_rate_limit",
+      "raw_signal_blocklist",
+      "high_impact_approval_token"
+    ]
+  },
+  "decomposition": {
+    "max_depth": 3,
+    "stopping_rule": "stop when subtask is directly executable OR depth >= max_depth"
+  },
+  "ruleReinject": {
+    "mode": "restate_with_reasoning",
+    "highPriorityRules": [
+      "LINE_RANGE_RULE",
+      "HARD_STOP_RULE",
+      "WHERE_WHAT_HOW_WHY"
+    ],
+    "lowPriorityRules": [
+      "COMMIT_FORMAT",
+      "SCOPE_LOCK"
+    ],
+    "requireRuleCheckGates": [
+      "GATE_I2",
+      "GATE_I3"
+    ]
+  },
+  "domainConfidenceOverride": true,
+  "autoregressiveControl": {
+    "relevanceThreshold": 0.6,
+    "baselineWindowTurns": 3,
+    "abaExemplarsMin": 2,
+    "abaExemplarsMax": 6,
+    "driftScoreThreshold": 0.3,
+    "vectorDimensions": 64
+  },
+  "cyclicalDriftDetection": {
+    "enabled": true,
+    "windowSize": 5,
+    "volatilityThreshold": 0.25,
+    "qualityDimensions": [
+      "evidenceKeys",
+      "whyFieldDepth",
+      "lineRangePresent",
+      "testEvidence"
+    ]
+  },
+  "stochasticVerification": {
+    "enabled": true,
+    "requiredConsistentRuns": 2,
+    "applyTo": [
+      "IMPLEMENT_COMPLETE",
+      "GATE_I3"
+    ]
+  },
+  "graphRegression": {
+    "enabled": true,
+    "suiteFile": "validation/graph_regression_suite.jsonl",
+    "blockUpdateOnFailure": true
+  },
+  "highImpactActions": {
+    "tags": [
+      "financial",
+      "data_deletion",
+      "access_control",
+      "production_config",
+      "irreversible"
+    ],
+    "requireHumanApproval": true,
+    "approvalTokenField": "human_approval_token"
+  },
+  "signalRateLimit": {
+    "enabled": true,
+    "maxSignalsPerMinute": 20,
+    "maxSignalBytes": 262144,
+    "patternBlocklist": [
+      "__proto__",
+      "eval(",
+      "process.env",
+      "rm -rf"
+    ]
+  },
+  "temporalRule": {
+    "edgeCaseMarginPercent": 10,
+    "requireConfigEvidenceKey": "config_verified",
+    "configPathEvidenceKey": "threshold_config_path",
+    "observedValueEvidenceKey": "threshold_observed_value",
+    "declaredLimitEvidenceKey": "threshold_declared_limit"
+  },
+  "validationMetrics": {
+    "suiteFile": "validation/validation_metrics.jsonl",
+    "calibrationBins": 10,
+    "requiredHorizons": [
+      10,
+      100,
+      1000
+    ],
+    "requiredMetrics": [
+      "GRR",
+      "IPR",
+      "ASR",
+      "MRS",
+      "CA",
+      "CALIBRATION"
+    ]
+  },
+  "redTeamSuite": {
+    "maxCaseLatencyMs": 250
+  },
+  "protocolState": {
+    "ownerKeyEvidence": "owner_key",
+    "workspaceKeyEvidence": "workspace_key",
+    "lockedGoalEvidence": "locked_goal",
+    "pivotApprovalEvidence": "pivot_approval",
+    "semanticSuccessEvidence": "semantic_success",
+    "handoffSnapshotEvidence": "handoff_snapshot"
+  },
+  "scope": {
+    "include": [
+      "projects/**",
+      "scripts/**",
+      "shared/**"
+    ],
+    "exclude": [
+      ".git/**",
+      "__pycache__/**",
+      "*.pyc",
+      "node_modules/**",
+      "out/**",
+      "out/LOCK",
+      "out/session.log",
+      "out/manifest.out"
+    ],
+    "protectedFiles": [
+      "manifesto.md",
+      "config.yml"
+    ],
+    "maxFilesPerStep": 4
+  },
+  "daemon": {
+    "watchDebounceMs": 200,
+    "readAfterChangeMs": 500,
+    "signalReadRetries": 5,
+    "signalReadRetryDelayMs": 100,
+    "autoStartWhenManifestoExists": true,
+    "lockOnHardStop": true,
+    "modalOnHardStop": true,
+    "notificationOnWarning": true,
+    "writeStopReason": true,
+    "stopReasonPath": "out/STOP_REASON.json"
+  },
+  "context": {
+    "warnTokenEstimate": 150000,
+    "stopTokenEstimate": 180000
+  },
+  "severity": {
+    "hardStopOn": [
+      "CRITICAL",
+      "HIGH"
+    ],
+    "warnOn": [
+      "MEDIUM"
+    ]
+  },
+  "checks": {
+    "CHECK-12": {
+      "id": "CHECK-12",
+      "name": "LOCK_CHECK",
+      "level": "HARD_STOP",
+      "preflight": true
+    },
+    "CHECK-01": {
+      "id": "CHECK-01",
+      "name": "SIGNAL_SCHEMA",
+      "level": "HARD_STOP"
+    },
+    "CHECK-02": {
+      "id": "CHECK-02",
+      "name": "SCOPE_GUARD",
+      "level": "HARD_STOP"
+    },
+    "CHECK-03": {
+      "id": "CHECK-03",
+      "name": "DONE_GUARD",
+      "level": "HARD_STOP"
+    },
+    "CHECK-04": {
+      "id": "CHECK-04",
+      "name": "ATOMIC_GUARD",
+      "level": "HARD_STOP"
+    },
+    "CHECK-05": {
+      "id": "CHECK-05",
+      "name": "SEARCH_GUARD",
+      "level": "HARD_STOP"
+    },
+    "CHECK-06": {
+      "id": "CHECK-06",
+      "name": "CONTEXT_GUARD",
+      "level": "WARN_OR_HARD_STOP"
+    },
+    "CHECK-07": {
+      "id": "CHECK-07",
+      "name": "CREDENTIAL_GUARD",
+      "level": "HARD_STOP"
+    },
+    "CHECK-08": {
+      "id": "CHECK-08",
+      "name": "TOOL_GUARD",
+      "level": "WARNING"
+    },
+    "CHECK-09": {
+      "id": "CHECK-09",
+      "name": "LINE_VERIFY",
+      "level": "HARD_STOP"
+    },
+    "CHECK-10": {
+      "id": "CHECK-10",
+      "name": "SELF_MOD_GUARD",
+      "level": "HARD_STOP"
+    },
+    "CHECK-11": {
+      "id": "CHECK-11",
+      "name": "GATE_ORDER",
+      "level": "WARN_OR_HARD_STOP"
+    }
+  },
+  "signal": {
+    "modes": [
+      "AUDIT",
+      "PLAN",
+      "IMPLEMENT"
+    ],
+    "gates": [
+      "OPEN",
+      "SESSION_START",
+      "GATE_A1",
+      "GATE_A2",
+      "GATE_A3",
+      "GATE_P1",
+      "GATE_P2",
+      "GATE_P3",
+      "GATE_I1",
+      "GATE_I2",
+      "GATE_I3"
+    ],
+    "statuses": [
+      "IN_PROGRESS",
+      "GATE_PASSED",
+      "COMPLETE",
+      "BLOCKED",
+      "IMPROVEMENT",
+      "SESSION_COMPLETE"
+    ],
+    "severities": [
+      "CRITICAL",
+      "HIGH",
+      "MEDIUM",
+      "LOW"
+    ],
+    "requiredFields": [
+      "session_id",
+      "step_number",
+      "mode",
+      "gate",
+      "status",
+      "files_declared",
+      "files_actually_touched",
+      "tool_used",
+      "test_name",
+      "test_exit_code",
+      "test_baseline_count",
+      "test_final_count",
+      "token_count_estimate",
+      "checklist_evidence",
+      "agent_declaration"
+    ],
+    "agentDeclarationFormat": "WHERE:<path:lines>|WHAT:<change>|HOW:<mechanism>|WHY:<failure_mode_closed>"
+  },
+  "gates": {
+    "AUDIT": [
+      "GATE_A1",
+      "GATE_A2",
+      "GATE_A3"
+    ],
+    "PLAN": [
+      "GATE_P1",
+      "GATE_P2",
+      "GATE_P3"
+    ],
+    "IMPLEMENT": [
+      "GATE_I1",
+      "GATE_I2",
+      "GATE_I3"
+    ]
+  },
+  "approval": {
+    "humanApprovalRequired": [
+      "GATE_A1",
+      "GATE_P3",
+      "GATE_I1"
+    ],
+    "approvalEvidenceRequired": true,
+    "approvalEvidenceKey": "human_approval"
+  },
+  "tools": {
+    "allowedPrefix": "anchr_tools",
+    "schemaVersion": "anchr_tools.v1",
+    "commands": [
+      "MANIFEST",
+      "VERIFY_MANIFEST",
+      "COUNT",
+      "VALIDATE_AUDIT",
+      "VALIDATE_PLAN",
+      "DIFF_REPORTS",
+      "VERIFY_LINE",
+      "SCOPE_CHECK",
+      "CHECKPOINT",
+      "DEFER",
+      "COMMIT_MSG",
+      "DOMAIN_COVERAGE",
+      "STATUS",
+      "BILLING_STATUS",
+      "SESSION_START",
+      "PROCEDURE_WRITE",
+      "PROCEDURE_QUERY",
+      "PROCEDURE_UPDATE",
+      "GRAPH_BUILD",
+      "GRAPH_UPDATE",
+      "GRAPH_REGRESSION",
+      "GRAPH_QUERY",
+      "GRAPH_CALLERS",
+      "GRAPH_CALLEES",
+      "GRAPH_RISKS",
+      "GRAPH_STATUS",
+      "DRIFT_METRICS",
+      "WEB_VERIFY",
+      "SYNC_SCAN",
+      "DEPLOY_EVENT"
+    ]
+  },
+  "security": {
+    "forbiddenSignalSubstrings": [
+      ".env",
+      "private keys",
+      "tokens",
+      "BEGIN PRIVATE KEY",
+      "AWS_SECRET_ACCESS_KEY",
+      "GITHUB_TOKEN",
+      "OPENAI_API_KEY",
+      "ANTHROPIC_API_KEY",
+      "password=",
+      "secret="
+    ],
+    "forbiddenDeclarationWords": [
+      "probably",
+      "might",
+      "could",
+      "appears to",
+      "seems like",
+      "likely",
+      "possibly",
+      "may be",
+      "I think",
+      "it looks like",
+      "it seems",
+      "could be",
+      "might be",
+      "perhaps",
+      "arguably",
+      "generally",
+      "typically",
+      "should work",
+      "should be",
+      "seems to",
+      "appears"
+    ],
+    "forbiddenWritePaths": [
+      "manifesto.md",
+      "config.yml"
+    ]
+  },
+  "reports": {
+    "auditItemPrefix": "FINDING",
+    "planItemPrefix": "PLAN",
+    "pendingStatus": "PENDING",
+    "doneStatus": "DONE",
+    "blockedStatus": "BLOCKED"
+  },
+  "logging": {
+    "appendOnlySessionLog": true,
+    "timestampFormat": "iso8601",
+    "logEveryToolCall": true,
+    "logEverySignalCheck": true,
+    "redactSecretsInLogs": true
+  },
+  "ui": {
+    "panelSections": [
+      "Daemon Status",
+      "Scope Config",
+      "Gate Config",
+      "Severity Config",
+      "Detected Agents",
+      "Audit Summary",
+      "Plan Summary",
+      "Audit Domain Coverage",
+      "Audit Review Queue",
+      "Evidence Completeness",
+      "Final Certification",
+      "Deferred Items",
+      "Anchr Graph",
+      "Session History",
+      "Session Log",
+      "Signal Quality Trend",
+      "Hard Stop History",
+      "Last Signal",
+      "Account"
+    ]
+  }
+}

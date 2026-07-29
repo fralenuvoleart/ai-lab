@@ -9,7 +9,6 @@ import sys
 from pathlib import Path
 
 from crawl4ai import AsyncWebCrawler
-from crawl4ai.extraction_strategy import LLMExtractionStrategy
 
 OUTPUT_ROOT = Path(__file__).resolve().parent.parent / "shared" / "datasets" / "scraped"
 

@@ -28,6 +28,14 @@ docker compose -f "${COMPOSE_FILE}" exec -T postgres \
     pg_dump -U "${DB_USER}" -d "${DB_NAME}" --no-owner --no-acl \
     | gzip > "${BACKUP_FILE}"
 
+# Verify backup integrity
+if [ "${PIPESTATUS[0]}" -ne 0 ]; then
+    echo "❌ pg_dump failed — backup may be incomplete"
+    rm -f "${BACKUP_FILE}"
+    exit 1
+fi
+sha256sum "${BACKUP_FILE}" > "${BACKUP_FILE}.sha256"
+
 echo "✅ Backup complete: ${BACKUP_FILE}"
 echo "   Size: $(du -h "${BACKUP_FILE}" | cut -f1)"
 

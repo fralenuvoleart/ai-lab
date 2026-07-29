@@ -35,3 +35,16 @@
 - Commit messages: present tense, imperative mood ("Add feature" not "Added feature").
 - Branch naming: `feature/`, `fix/`, `experiment/` prefixes.
 - No committing `.env` files, `.log` files, or database storage directories.
+
+# ANCHR Protocol
+
+Before any work in this repository (run from the repo root):
+1. Run: python .anchr/anchr_tools.py STATUS  (reports lock_exists). If lock_exists is true, stop and notify the human.
+2. Run: python .anchr/anchr_tools.py GRAPH_STATUS
+3. Read .anchr/start.md completely
+4. Follow start.md steps 1-6. Do not skip step 4 (human confirmation gate).
+5. If GRAPH_STATUS is fresh, use GRAPH_QUERY before GATE_A1 and GRAPH_CALLERS/GRAPH_CALLEES before GATE_I1.
+6. Write .anchr/out/signal.json after every atomic step
+
+(On macOS/Linux use python3 if python is not Python 3.)
+See .anchr/manifesto.md for full operating contract.

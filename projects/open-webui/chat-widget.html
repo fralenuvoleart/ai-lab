@@ -52,6 +52,8 @@
     if (s) s.remove();
   }
 
+  let activeController = null;
+
   window.owuiSend = async function() {
     const text = input.value.trim();
     if (!text) return;
@@ -62,6 +64,11 @@
     history.push({ role: 'user', content: text });
     addStatus('Thinking...');
 
+    // Abort any in-flight request
+    if (activeController) activeController.abort();
+    activeController = new AbortController();
+    const timeoutId = setTimeout(() => activeController.abort(), 30000);
+
     try {
       const resp = await fetch(API_URL, {
         method: 'POST',
@@ -69,8 +76,10 @@
           'Authorization': 'Bearer ' + API_KEY,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ model: MODEL, messages: history })
+        body: JSON.stringify({ model: MODEL, messages: history }),
+        signal: activeController.signal
       });
+      clearTimeout(timeoutId);
 
       if (!resp.ok) {
         removeStatus();
@@ -86,7 +95,6 @@
       history.push({ role: 'assistant', content: reply });
       addMsg('assistant', reply);
 
-      // Show token usage if available
       if (data.usage) {
         const u = document.createElement('div');
         u.style.cssText = 'font-size:11px;color:#9ca3af;margin-bottom:12px;text-align:right';
@@ -95,10 +103,16 @@
       }
 
     } catch (e) {
+      clearTimeout(timeoutId);
       removeStatus();
-      addMsg('assistant', 'Connection error. Is the server reachable?');
+      if (e.name === 'AbortError') {
+        addMsg('assistant', 'Request timed out. Please try again.');
+      } else {
+        addMsg('assistant', 'Connection error. Is the server reachable?');
+      }
     }
 
+    activeController = null;
     input.disabled = false;
     input.focus();
   };

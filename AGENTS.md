@@ -56,3 +56,35 @@ Do not guess, speculate, extrapolate, or assume.
 # ⚖️ Self-Audit Protocol
 - Before declaring a task finished, review the rules above and perform a silent "Pass/Fail" verification.
 - If a "Fail" is identified on any constraint or quality check, correct it before completing the session.
+
+# ANCHR — AI Agent Guard Protocol
+
+This repository uses Anchr to enforce audit integrity and prevent agent drift.
+The Anchr daemon is running. Every file change is monitored.
+
+MANDATORY SESSION START:
+  Read .anchr/start.md completely and follow its steps in order.
+  Do not write code, do not read other files, do not make assumptions.
+  Open .anchr/start.md and read every line before anything else — it runs cross-platform.
+
+MANDATORY DURING EVERY STEP:
+  Write .anchr/out/signal.json after every atomic action.
+  Schema: see .anchr/manifesto.md section SIGNAL CONTRACT.
+  Gate protocol: AUDIT → PLAN → IMPLEMENT.
+  One plan item per cycle. No batching.
+  If .anchr/graph.db exists and GRAPH_STATUS is fresh:
+    Run GRAPH_QUERY before GATE_A1 scope declaration.
+    Run GRAPH_CALLERS and GRAPH_CALLEES before GATE_I1 dependency analysis.
+    Use source files for LINE_VERIFY and exact citations, not first-pass understanding.
+
+HARD STOPS (daemon enforces these — no override possible):
+  Missing signal after file change → CHECK-02 SCOPE_GUARD fires
+  Test claimed without running → CHECK-03 DONE_GUARD fires
+  LOCK file present → all signals rejected until human clears lock
+  Out-of-scope file changed → HARD STOP immediately
+
+You cannot proceed without the HITL checkpoint in .anchr/start.md Step 4.
+The human must confirm your session plan before you write a single line.
+
+Full operating contract: .anchr/manifesto.md
+Session entry point: .anchr/start.md

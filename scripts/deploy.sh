@@ -17,9 +17,17 @@ if [ -z "$TARGET" ]; then
     exit 1
 fi
 
+DRY_RUN=""
+if [ "${1:-}" = "--dry-run" ]; then
+    DRY_RUN="--dry-run"
+    echo "🔍 DRY RUN — no changes will be made"
+    shift
+    TARGET="${1:-${DEPLOY_HOST:-}}"
+fi
+
 echo "🚀 Deploying to ${REMOTE_USER}@${TARGET}:${REMOTE_PATH} ..."
 
-rsync -avz --delete \
+rsync -avz ${DRY_RUN} --delete \
     --exclude-from="${EXCLUDE_FILE}" \
     --exclude='.git' \
     --exclude='node_modules' \

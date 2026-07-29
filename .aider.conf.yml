@@ -1,0 +1,6 @@
+# ANCHR Protocol — Aider
+# Aider loads this repo-root config automatically.
+# The read-only files below keep Anchr protocol context visible at startup.
+read:
+  - .anchr/manifesto.md
+  - .anchr/start.md

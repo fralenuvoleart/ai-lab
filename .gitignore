@@ -80,3 +80,10 @@ backups/
 *.tfstate
 *.tfstate.*
 .terraform/
+
+# Anchr runtime artifacts — machine-generated, do not commit
+.anchr/out/
+.anchr/graph.db
+.anchr/graph.db-journal
+.anchr/graph.db-wal
+.anchr/graph.db-shm

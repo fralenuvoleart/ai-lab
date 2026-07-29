@@ -25,7 +25,13 @@ CRAWL_CONFIG = CrawlerRunConfig(
 def fetch_sitemap_urls(sitemap_url: str) -> list[str]:
     resp = requests.get(sitemap_url, timeout=30)
     resp.raise_for_status()
-    root = ET.fromstring(resp.content)
+    content_type = resp.headers.get("Content-Type", "")
+    if "xml" not in content_type and not resp.text.strip().startswith("<?xml"):
+        raise ValueError(f"Sitemap URL returned non-XML content (Content-Type: {content_type})")
+    try:
+        root = ET.fromstring(resp.content)
+    except ET.ParseError as e:
+        raise ValueError(f"Failed to parse sitemap XML: {e}") from e
     ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     urls = []
     for el in root.findall(".//sm:url/sm:loc", ns):

@@ -4,8 +4,10 @@ Multi-Agent CrewAI Experiment
 A Python-based multi-agent setup using CrewAI for collaborative task execution.
 """
 
+import logging
 from crewai import Agent, Task, Crew, Process
 
+logger = logging.getLogger(__name__)
 
 # --- Define Agents ---
 
@@ -47,16 +49,25 @@ crew = Crew(
     tasks=[research_task, writing_task],
     process=Process.sequential,
     verbose=True,
+    max_rpm=10,
+    memory=True,
+    cache=True,
 )
 
 
 def main():
     """Entry point for the multi-agent crew experiment."""
+    logger.info("Launching Multi-Agent Crew...")
     print("🚀 Launching Multi-Agent Crew...")
-    result = crew.kickoff()
-    print("\n=== CREW OUTPUT ===")
-    print(result)
-    return result
+    try:
+        result = crew.kickoff()
+        print("\n=== CREW OUTPUT ===")
+        print(result)
+        logger.info("Crew execution completed. Token usage: %s", getattr(result, 'token_usage', 'not tracked'))
+        return result
+    except Exception:
+        logger.critical("Crew execution failed", exc_info=True)
+        raise
 
 
 if __name__ == "__main__":

@@ -1,0 +1,20 @@
+# Anchr Plan Report Template
+
+Use one block per validated audit finding. Do not omit labels. Values are parsed by `anchr_tools.py VALIDATE_PLAN`.
+
+PLAN-0001
+status: PENDING
+finding_id: FINDING-0001
+finding_ref: FINDING-0001
+scope: Fix token validation only for the audited auth entry point; do not refactor unrelated auth flows.
+files:
+- src/example.ts
+- src/example.test.ts
+steps:
+1. Locate the existing repository token verification helper.
+2. Replace direct decode with verified token parsing.
+3. Add a regression test for invalid signature rejection.
+verification: npm test -- src/example.test.ts
+docs: No public docs change required; behavior is internal auth hardening.
+rollback: Revert this plan item commit and restore the previous token handling path.
+human_approval: REQUIRED before GATE_I1.

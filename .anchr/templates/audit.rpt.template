@@ -1,0 +1,63 @@
+# Anchr Audit Report Template
+
+Use one block per confirmed finding. Do not omit labels. Values are parsed by `anchr_tools.py VALIDATE_AUDIT`.
+
+date: {ISO}
+pass1_findings: {N}
+pass2_confirmed: {N}
+pass2_rejected: {N}
+final_gap_count: {N}
+
+--- PASS 1 DISCOVERY LOG ---
+
+PASS1-001 UNVERIFIED
+file: src/example.ts
+line_start: 10
+line_end: 12
+issue: Potential token validation gap found during discovery only.
+status: UNVERIFIED
+
+Pass 1 rows are discovery-only. Never mark a `PASS1-NNN` row CONFIRMED.
+
+--- DOMAIN COVERAGE ---
+
+Use one line for every enabled domain. `EXAMINED` requires concrete repository evidence.
+`NOT_APPLICABLE` requires a product-specific reason. Zero findings alone is not coverage.
+
+DOMAIN-COVERAGE CQ EXAMINED evidence: src/:L1-L200 reviewed for code-quality controls
+DOMAIN-COVERAGE AI NOT_APPLICABLE reason: product has no AI or LLM execution path
+
+--- CONFIRMED FINDINGS ---
+
+FINDING-0001
+code: SEC-20
+file: src/example.ts
+line_start: 10
+line_end: 12
+snippet_actual: const token = request.headers.authorization;
+severity: HIGH
+issue: Authorization token is decoded without validating issuer, audience, expiry, or signature.
+source_url: https://owasp.org/API-Security/editions/2023/en/0xa2-broken-authentication/
+pass1_ref: PASS1-001
+pass2_status: CONFIRMED
+p1_verdict: AGREES - affects agent runtime signal reliability.
+p2_verdict: AGREES - developer can reproduce the finding from the cited line.
+p3_verdict: AGREES - affects enterprise audit and security posture.
+evidence: Full file was read before this finding was written.
+recommended_fix: Validate token signature and registered claims through the repository's existing auth middleware.
+scope_notes: Finding is limited to the listed file and line span.
+
+--- REJECTED FINDINGS ---
+
+REJECTED-001
+pass1_ref: PASS1-002
+reason: Pass 2 found the claimed gap handled in src/example_guard.ts:L20-L31.
+
+--- CONTESTED FINDINGS ---
+
+CONTESTED-001
+pass1_ref: PASS1-003
+p1_verdict: AGREES - agent runtime risk exists.
+p2_verdict: DISAGREES - local reproduction rejects the finding.
+p3_verdict: AGREES - compliance review should decide.
+user_decision_required: Should this contested finding become a confirmed FINDING item?
