@@ -6,24 +6,34 @@
 
 | Service | Image | Port | RAM | Purpose |
 |---------|-------|------|-----|---------|
-| Caddy | `caddy:2-alpine` | 80, 443 | ~18 MB | Reverse proxy + auto-SSL |
+| Caddy | `caddy:2-alpine` | 80, 443 | ~16 MB | Reverse proxy + auto-SSL |
 | PostgreSQL | `pgvector/pgvector:pg17` | 5432 | ~24 MB | Shared DB (idle, future RAG) |
-| Open WebUI | `ghcr.io/open-webui/open-webui:main` | 3000→8080 | ~890 MB | Chat interface |
+| Open WebUI | `ghcr.io/open-webui/open-webui:main` | 3000→8080 | ~670 MB | Chat interface |
+| SearXNG | `searxng/searxng:latest` | 8888 | ~108 MB | Self-hosted metasearch |
+| SearXNG Redis | `redis:7-alpine` | — | ~4 MB | Caching/rate limiting |
 
-## MCP Servers (systemd)
+## Systemd Services
 
-| Service | Command | Port | Tools | Purpose |
-|---------|---------|------|-------|---------|
-| `basic-memory` | `mcpo → basic-memory mcp` | 8000 | 10 | Persistent memory (`.md` files in `/data/vault/`) |
-| `mcp-tools` | `mcpo → fetch + github` | 8001 | 8 | Web fetch + GitHub API |
+| Service | Command | Port | Purpose |
+|---------|---------|------|---------|
+| `basic-memory` | `mcpo → basic-memory mcp` | 8000 | Persistent memory (`.md` in `/data/vault/`) |
+| `mcp-tools` | `mcpo → fetch + github + searxng` | 8001 | Web fetch + GitHub + SearXNG |
+| `telegram-bot` | Python → Open WebUI API | — | Telegram ↔ AI chat bridge |
 
 ## Open WebUI Tool Servers
 
-| Tool | URL | Tools | Filter List |
-|------|-----|-------|-------------|
-| Basic Memory | `http://host.docker.internal:8000` | 10 | `tool_write_note_post, tool_read_note_post, tool_edit_note_post, tool_delete_note_post, tool_search_notes_post, tool_build_context_post, tool_list_directory_post, tool_read_content_post, tool_recent_activity_post, tool_list_memory_projects_post` |
-| GitHub | `http://host.docker.internal:8001/github` | 7 | `tool_search_repositories_post, tool_get_file_contents_post, tool_create_or_update_file_post, tool_search_code_post, tool_list_commits_post, tool_list_issues_post, tool_get_issue_post` |
-| Fetch | `http://host.docker.internal:8001/fetch` | 1 | `tool_fetch_post` |
+| Tool | URL | Active Functions |
+|------|-----|-----------------|
+| Basic Memory | `http://host.docker.internal:8000` | 10 (write_note, search_notes, edit_note, delete_note, build_context, list_directory, read_content, recent_activity, list_memory_projects, read_note) |
+| GitHub | `http://host.docker.internal:8001/github` | 7 (search_repositories, get_file_contents, create_or_update_file, search_code, list_commits, list_issues, get_issue) |
+| Fetch | `http://host.docker.internal:8001/fetch` | 1 (fetch) |
+| SearXNG | `http://host.docker.internal:8001/searxng` | 1 (search_web) |
+
+## Open WebUI Functions
+
+| Function | Type | Purpose |
+|----------|------|---------|
+| Telegram Agent Pipe | Pipe (model: `telegram_agent_pipe`) | Server-side tool execution loop for API/Telegram. Auto-discovers tools from mcpo endpoints. Async, non-blocking. |
 
 ## Models
 
@@ -33,28 +43,54 @@
 | OpenRouter | Google Gemini Pro Latest | Secondary |
 | Ollama (host) | Various | Local, on-demand |
 
+## Telegram Bot
+
+- **Systemd:** `telegram-bot.service`
+- **Model:** `telegram_agent_pipe` (calls Pipe for tool execution)
+- **Tool IDs:** Hardcoded in bot (18 tools across memory/github/fetch/searxng)
+- **Prompt:** Inherited from `telegram-chat` model via API
+
+## SearXNG — 13 Active Engines
+
+duckduckgo, brave, qwant, startpage, mojeek, yahoo, bing news, google news, wikidata, presearch, mwmbl, tusksearch, wiby
+
+Full list: [`docs/SEARXNG.md`](SEARXNG.md)
+
 ## Disk Layout
 
 ```
 /data/vault/          — Basic Memory vault (Personal/ + Projects/)
 /opt/ai-lab/          — Workspace (rsync'd from dev machine)
-/opt/repos/           — Reserved for git clones (unused)
+/opt/searxng/         — SearXNG docker-compose + config
+/opt/repos/           — Reserved for git clones
 /root/.basic-memory/  — basic-memory config + SQLite DB
-/root/.mcpo-tools.json — mcpo multi-server config
+/root/.mcpo-tools.json — mcpo multi-server config (fetch + github + searxng)
 ```
 
-## Services
+## Service Management
 
 ```bash
-systemctl status basic-memory   # Memory MCP (mcpo on :8000)
-systemctl status mcp-tools      # Fetch + GitHub MCP (mcpo on :8001)
+# Docker
+docker ps
+cd /opt/searxng && docker compose restart
+
+# Systemd
+systemctl status basic-memory mcp-tools telegram-bot
+journalctl -u telegram-bot -f
+
+# Backups
+/opt/ai-lab/scripts/backup-full.sh
 ```
 
 ## Key Decisions
 
-- **Qdrant removed** — redundant with basic-memory's built-in semantic search
-- **PostgreSQL kept idle** — 24 MB, available for future RAG projects
-- **GitHub MCP over git MCP** — works via API, no local clones needed
-- **mcpo/OpenAPI over native MCP** — avoids DeepSeek's DSML function calling bug
-- **Tool lists trimmed** — 18 total tools avoid model context limits
-- **Memory toggle OFF per-model** — prevents conflict with Open WebUI's built-in memory
+- **Qdrant removed** — redundant with basic-memory's semantic search
+- **PostgreSQL kept idle** — 24 MB, available for future RAG
+- **GitHub MCP over git MCP** — works via API, no local clones
+- **mcpo/OpenAPI over native MCP** — avoids DeepSeek's DSML bug
+- **Pipe for API tool execution** — Open WebUI API doesn't handle tools natively
+- **SearXNG with Redis** — rate limiting for upstream engines
+- **13 engines, no API keys** — free metasearch, datacenter IP limits some engines
+- **Telegram bot calls Pipe** — 30-line bot, all logic in Pipe
+- **Memory toggle OFF per-model** — prevents conflict with Open WebUI built-in memory
+- **Tool lists trimmed** — avoids model context limits

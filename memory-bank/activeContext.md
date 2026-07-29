@@ -39,3 +39,16 @@ AI-LAB deployed on Hetzner VPS with shared infrastructure running (Caddy, Postgr
   - 23 MCP tools: write_note, search_notes, build_context, edit_note, delete_note, read_note, list_directory, move_note, etc.
   - Open WebUI config: Admin → External Tools → MCP (Streamable HTTP) → `http://host.docker.internal:8000/mcp`
   - 157 MB RAM usage, auto-restarts on failure
+- **2026-07-28/29**: Major infrastructure expansion:
+  - **Telegram bot** deployed (`telegram-bot.service`) — bridges Telegram ↔ Open WebUI via API
+  - **Pipe agent** (`telegram_agent_pipe`) — async Open WebUI Pipe that auto-discovers tools from mcpo endpoints and handles tool execution loop server-side. Enables tool use via API/Telegram.
+  - **GitHub MCP** installed (Node.js + `@modelcontextprotocol/server-github`) — 7 tools via mcpo on port 8001/github
+  - **Fetch MCP** installed (`mcp-server-fetch`) — 1 tool via mcpo on port 8001/fetch
+  - **SearXNG** deployed (Docker + Redis, port 8888) — self-hosted metasearch with 13 free engines (duckduckgo, brave, qwant, startpage, mojeek, yahoo, bing_news, google_news, wikidata, presearch, mwmbl, tusksearch, wiby)
+  - **SearXNG MCP** — custom Python MCP server wrapping SearXNG JSON API, exposed via mcpo, auto-discovered by Pipe
+  - **Qdrant removed** — redundant
+  - **API key** enabled via `USER_PERMISSIONS_FEATURES_API_KEYS=true`
+  - **Full backup script** (`scripts/backup-full.sh`) — tars vault, webui.db, configs
+  - **STACK.md** and **SEARXNG.md** docs updated
+  - Architecture: Telegram → bot → Pipe → model + tools (memory, github, fetch, searxng). Web UI uses native tool handling. Two independent paths.
+  - RAM: 2.4GB used, 1.4GB free. 13 engines active.
