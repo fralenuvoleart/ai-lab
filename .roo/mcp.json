@@ -21,7 +21,8 @@
 				"sevalla.deployments.start",
 				"sevalla.resources.process-resource-types",
 				"sevalla.deployments.list"
-			]
+			],
+			"disabled": true
 		},
 		"tavily": {
 			"command": "npx",
