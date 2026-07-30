@@ -51,7 +51,14 @@ class Pipe:
                         opid = details.get("operationId", "")
                         clean = opid.replace("tool_", "").replace("_post", "")
                         opid = f"{name}_{clean}" if clean else f"{name}_{path.strip('/').replace('/', '_')}"
-                        path_map[opid] = (base_url, path, method.upper())
+                        # Extract parameter schema from requestBody
+                        params_schema = {}
+                        req_body = details.get("requestBody", {})
+                        json_body = req_body.get("content", {}).get("application/json", {})
+                        schema = json_body.get("schema", {})
+                        params_schema["properties"] = schema.get("properties", {})
+                        params_schema["required"] = schema.get("required", [])
+                        path_map[opid] = (base_url, path, method.upper(), params_schema)
             except Exception:
                 logger.warning("MCP endpoint %s unreachable", name)
         return path_map
@@ -59,12 +66,14 @@ class Pipe:
     async def _execute_tool(self, client: httpx.AsyncClient, opid: str, args: dict, path_map: dict) -> str:
         if opid not in path_map:
             return f"Error: tool '{opid}' not available"
-        base_url, path, method = path_map[opid]
+        base_url, path, method, _ = path_map[opid]
         try:
             r = await client.request(method, f"{base_url}{path}", json=args, timeout=15.0)
-            return r.text[:1000]
+            result = r.text[:1000]
+            logger.info("Tool %s(%s) => HTTP %s, %d chars", opid, args, r.status_code, len(result))
+            return result
         except Exception as e:
-            logger.error("Tool %s failed: %s", opid, e)
+            logger.error("Tool %s(%s) failed: %s", opid, args, e)
             return f"Error: {e}"
 
     def _build_tool_tags(self, path_map: dict) -> dict:
@@ -74,28 +83,42 @@ class Pipe:
             parts = opid.split("_")
             if parts[-1] == "post":
                 parts = parts[:-1]
-            # Build tag: first 2 parts joined (e.g. "memory_search", "searxng_searxng_search")
-            if len(parts) >= 2:
-                tag = "_".join(parts[:2])
+            # Strip source prefix (first segment), use rest as tag
+            # e.g. "searxng_searxng_search" → "searxng_search"
+            if len(parts) > 1:
+                tag = "_".join(parts[1:])
             else:
                 tag = opid
             tag_map[tag] = opid
         return tag_map
 
-    def _build_system_prompt(self, tag_map: dict) -> str:
-        """Generate system prompt listing available tools."""
+    def _build_system_prompt(self, tag_map: dict, path_map: dict) -> str:
+        """Generate system prompt listing available tools with parameters."""
         if not tag_map:
             return ""
         lines = [
             "You have access to these tools. To use a tool, output ONLY the XML tag.",
+            "DO NOT output any text before or after the XML tags — just the tags.",
+            "",
             "Available tools:",
         ]
         for tag, opid in sorted(tag_map.items()):
-            lines.append(f"  <{tag.upper()}></{tag.upper()}> — {opid}")
+            _, _, _, schema = path_map.get(opid, ("", "", "", {}))
+            props = schema.get("properties", {})
+            reqs = schema.get("required", [])
+            arg_desc = ", ".join(
+                f"{k}={'*' if k in reqs else ''}{list(v.get('anyOf',[{}]))[0].get('type','str') if 'anyOf' in v else v.get('type','str')}"
+                for k, v in props.items()
+            )
+            lines.append(f"  <{tag.upper()}> — {opid}")
+            if arg_desc:
+                lines.append(f"      args: {arg_desc}  (* = required)")
         lines.append("")
-        lines.append("For search tools, nest the search terms inside the tag: <TAG>search terms here</TAG>")
-        lines.append("For other tools, use attributes: <TAG key=\"value\" />")
-        lines.append("After receiving tool results, provide your final answer without XML tags.")
+        lines.append("For tools with a 'query' parameter, nest the text: <TAG>text here</TAG>")
+        lines.append("For other tools, use attributes: <TAG key=\"value\" key2=\"value2\" />")
+        lines.append("")
+        lines.append("IMPORTANT: After you get tool results, provide your final answer.")
+        lines.append("Do NOT output any XML tags in your final response.")
         return "\n".join(lines)
 
     def _extract_text_tool_calls(self, content: str, tag_map: dict) -> list[dict]:
@@ -144,7 +167,7 @@ class Pipe:
         async with httpx.AsyncClient() as http:
             path_map = await self._discover_tools(http)
             tag_map = self._build_tool_tags(path_map)
-            sys_prompt = self._build_system_prompt(tag_map)
+            sys_prompt = self._build_system_prompt(tag_map, path_map)
             if sys_prompt:
                 messages = [{"role": "system", "content": sys_prompt}] + list(messages)
             logger.info("Discovered %d tools, %d tags", len(path_map), len(tag_map))
@@ -161,7 +184,7 @@ class Pipe:
                 if not text_calls:
                     break
                 max_loops -= 1
-                logger.info("Text tool calls: %s", [(c["tool"], c["args"]) for c in text_calls])
+                logger.info("Text tool calls (loop %d): %s", 5 - max_loops, [(c["tool"], c["args"]) for c in text_calls])
 
                 # Execute tools
                 results = []
@@ -180,6 +203,18 @@ class Pipe:
                     "Now provide your final answer to the user. Do NOT output any XML or HTML tags."
                 )})
 
+                response = await api_client.chat.completions.create(
+                    model=self.valves.BASE_MODEL, messages=messages,
+                    stream=False, timeout=60.0,
+                )
+                content = response.choices[0].message.content or ""
+
+            # Strip any remaining XML and make one final synthesis call if needed
+            if _TEXT_TOOL_RE.search(content) or _SELF_CLOSING_RE.search(content):
+                logger.info("XML still in output after %d loops — stripping and re-prompting", 5 - max_loops)
+                clean = _TEXT_TOOL_RE.sub("", _SELF_CLOSING_RE.sub("", content)).strip()
+                messages.append({"role": "assistant", "content": clean})
+                messages.append({"role": "user", "content": "Synthesize the tool results above into a clear final answer. Do NOT use ANY XML tags. Just write the answer in natural language."})
                 response = await api_client.chat.completions.create(
                     model=self.valves.BASE_MODEL, messages=messages,
                     stream=False, timeout=60.0,

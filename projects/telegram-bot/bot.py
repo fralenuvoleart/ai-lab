@@ -38,7 +38,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     try:
         response = client.chat.completions.create(
             model=PIPE_MODEL, messages=list(history[chat_id]), stream=False,
-            timeout=30.0,
+            timeout=120.0,
         )
         reply = response.choices[0].message.content or ""
         history[chat_id].append({"role": "assistant", "content": reply})
