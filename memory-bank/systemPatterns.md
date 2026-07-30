@@ -13,7 +13,9 @@
 |------|--------|
 | **infra/ isolation** | Do NOT modify `infra/` when working on an isolated `projects/` experiment unless explicitly asked. |
 | **Project scaffolding** | New experiments MUST be copied from `projects/_template/`. |
-| **Secret management** | Reference `.env` files; use `${VAR_NAME}` in docker-compose; never hardcode keys. |
+| **Secret management** | Real secrets in `secrets/` (git-crypt encrypted), templates in `config/`. Deploy via `scripts/deploy-config.sh`. |
+| **Config convention** | `config/` and `secrets/` grouped by service folder (basic-memory, mcp-tools, ollama, open-webui, searxng, telegram-bot). One folder per service. |
+| **Data layout** | All persistent data under `/opt/ai-lab/data/`: `open-webui/` (webui.db, uploads), `vault/` (basic-memory notes). |
 | **Docker compose v2** | Always use `docker compose` (plugin), not `docker-compose` (v1). |
 | **Shell safety** | Every `.sh` script starts with `set -euo pipefail`. |
 
