@@ -105,6 +105,24 @@ systemctl restart basic-memory    # Restart after config changes
 journalctl -u basic-memory -f     # Tail logs
 ```
 
+## Required Environment Variables
+
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `WEBUI_SECRET_KEY` | **YES** | JWT signing secret — must be set or auth breaks |
+| `OPENAI_API_KEY` | No | Default API key for OpenAI-compatible providers |
+| `TAVILY_API_KEY` | No | Web search API key (if web search enabled) |
+| `RAG_OPENAI_API_KEY` | No | Embeddings API key (if RAG enabled) |
+
+Generate a secret key: `openssl rand -hex 32`
+
+## Secrets Management
+
+- **Never commit `.env` to git** — it is in `.gitignore`
+- **Rotate API keys regularly** — especially after sharing access or suspected exposure
+- **`.env` contains multiple credentials** (OpenAI, Tavily, RAG, WebUI secret) — treat it as a high-value target
+- For production, consider [Docker secrets](https://docs.docker.com/compose/how-tos/use-secrets/) instead of flat `.env` files
+
 ## Notes
 
 - **Data**: All chats, users, and settings persist in `./data/` (excluded from rsync deploys — back up separately)
