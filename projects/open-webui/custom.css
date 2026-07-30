@@ -1,0 +1,16 @@
+/* ==============================================================================
+ * Open WebUI — Custom Theme Override
+ * Injected at /app/build/static/custom.css via Docker build
+ * 
+ */
+
+/* 
+ * Image rendering in markdown tables only — force inline display with controlled sizing.
+ */
+
+table img {
+  display: inline !important;
+  vertical-align: middle !important;
+  max-width: 150px !important;
+  border-radius: 8px !important;
+}

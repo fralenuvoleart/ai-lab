@@ -4,7 +4,13 @@
 
 services:
   open-webui:
-    image: ghcr.io/open-webui/open-webui:main
+    # Build from local Dockerfile to inject custom.css theme overrides.
+    # To revert to stock image, replace 'build:' block with:
+    #   image: ghcr.io/open-webui/open-webui:main
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ailab-open-webui:custom
     container_name: ailab-open-webui
     restart: unless-stopped
     ports:
