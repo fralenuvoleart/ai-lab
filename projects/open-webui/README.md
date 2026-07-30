@@ -1,4 +1,4 @@
-# Open WebUI — Self-hosted AI Chat Interface
+# Open WebUI — Self-hosted AI Chat Interface 
 
 Open WebUI is a ChatGPT-like interface that connects to any OpenAI-compatible API (Groq, OpenRouter, local Ollama, etc.). No GPU required — it's purely a web proxy to external LLM providers.
 
