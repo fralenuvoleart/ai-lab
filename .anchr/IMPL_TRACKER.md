@@ -1,38 +1,26 @@
 # ANCHR IMPL TRACKER
-Last updated: 2026-07-30T06:41:00Z
-Context at last update: ~85%
+Last updated: 2026-07-30T09:25:00Z
 
 ## Current State
-MODE: IMPLEMENT
-ACTIVE_PART: ALL PHASES COMPLETE
-ACTIVE_ITEM: PLAN-MIGRATION-001 — COMPLETE
-LAST_ACTION: GATE_I3 COMPLETE — Phase 4 done. deploy.sh updated with pull/push separation, deploy-config.sh created.
-NEXT_ACTION: STOPPED — migration fully complete. Human should test Telegram bot with live message.
+MODE: AUDIT (verification)
+ACTIVE_ITEM: Migration audit — COMPLETE
+LAST_ACTION: Server cleanup (data.old removed, /data/vault removed), git committed
+NEXT_ACTION: STOPPED — audit complete. All paths migrated, conventions consistent, zero regressions.
 
-## Protocol Gates Completed
-- [x] SESSION_START (step 1)
-- [x] GATE_I2 — Phase 1: files pulled, staged, git-crypt configured
-- [x] GATE_I3 — Phase 1: 314 files committed, encryption verified
-- [x] GATE_I2 — Phase 2: server backups, symlinks, path updates
-- [x] GATE_I3 — Phase 3: all 5 services healthy after restart
-- [x] GATE_I3 — Phase 4: deploy.sh + deploy-config.sh committed
+## Audit Results
+- config/systemd references: 0 (outside plans/)
+- config/mcpo references: 0 (outside plans/)
+- Flat secrets/ references: 0
+- /data/vault stale paths: 4 (historical memory-bank only)
+- Server: 8/8 services healthy
+- Conventions: config/ and secrets/ both grouped by service
 
-## Git Commits
-- ad64ba0 feat(scripts): add bidirectional deploy with knowledge asset sync
-- efb984d fix(secrets): re-commit with correct git-crypt encryption
-- 01e9880 Add 1 git-crypt collaborator
-- a9b0916 feat(config): migrate all server configs, secrets, and knowledge assets into repo
+## Completed This Session
+- Migration audit: 0 actionable findings
+- README.md: 5 /data/vault references updated
+- scripts: deploy.sh, deploy-config.sh, backup-full.sh paths verified
+- Server: data.old (1.4GB) removed, empty /data/vault removed
+- Git: all changes committed
 
 ## Session Handover Note
-All 4 phases complete. The workspace now contains:
-- config/ (14 files): SearXNG, systemd, basic-memory, ollama manifest, .example templates
-- secrets/ (6 files): git-crypt encrypted real tokens (GPG key: 91EA0175D20A372B)
-- data/vault/Personal/ (3 .md): AI memory files
-- projects/open-webui/data/webui.db + uploads/ (~150 files)
-- scripts/deploy.sh: pull data FROM server + push code TO server
-- scripts/deploy-config.sh: scp secrets + systemd units, reload+restart
-
-To use on another machine:
-1. git-crypt unlock (requires GPG private key)
-2. Run scripts/deploy.sh to push configs + pull latest data
-3. Run scripts/deploy-config.sh if secrets changed
+Audit complete. All stale references resolved. Server clean. Config conventions unified.
