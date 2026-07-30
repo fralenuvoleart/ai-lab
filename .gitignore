@@ -88,13 +88,15 @@ backups/
 .anchr/graph.db-wal
 .anchr/graph.db-shm
 
-# === Workspace config migration — runtime / regeneratable exclusions ===
-projects/open-webui/data/vector_db/
-projects/open-webui/data/cache/
-projects/open-webui/data/webui.db-shm
-projects/open-webui/data/webui.db-wal
+# === Data backups (pulled from server, excluded from rsync push) ===
+data/open-webui/vector_db/
+data/open-webui/cache/
+data/open-webui/webui.db-shm
+data/open-webui/webui.db-wal
 
 # === Explicitly tracked despite wildcard rules above ===
-!projects/open-webui/data/webui.db
+!data/open-webui/webui.db
+!data/open-webui/uploads/
+!data/open-webui/.gitkeep
 !data/vault/Personal/
 !data/vault/Projects/
