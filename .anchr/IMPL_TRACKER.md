@@ -1,50 +1,30 @@
 # ANCHR IMPL TRACKER
-Last updated: [agent fills this]
-Context at last update: [N]%
+Last updated: 2026-07-30T03:03:31Z
+Context at last update: ~20%
 
 ## Current State
-MODE: [AUDIT / PLAN / IMPLEMENT / VERIFY]
-ACTIVE_PART: [4 / 5 / 6 / 7 / 8]
-ACTIVE_ITEM: [exact item ID or description]
-LAST_ACTION: [what was just completed]
-NEXT_ACTION: [exactly what to do next — precise enough that a fresh agent can resume]
+MODE: IMPLEMENT
+ACTIVE_PART: N/A (ad-hoc fix outside standard Part structure)
+ACTIVE_ITEM: PLAN-SEARXNG-001 — COMPLETE
+LAST_ACTION: GATE_I3 COMPLETE — code deployed, valves configured, all 4 mcpo endpoints verified HTTP 200
+NEXT_ACTION: STOPPED — task complete. Human should test Telegram bot with /start + tool-using query.
+
+## Protocol Gates Completed
+- [x] SESSION_START (step 1)
+- [x] GATE_I2 — file changed: pipe-agent.py:L34, L48 (step 2)
+- [x] GATE_I3 — COMPLETE: deploy verified, valves DB-confirmed, endpoints healthy (steps 3-4)
 
 ## Parts Status
-Part 1 (E1-E8):   [ ] DONE  [ ] PARTIAL  [ ] IN_PROGRESS  [ ] NOT_STARTED
-Part 2 (E9-E14):  [ ] DONE  [ ] PARTIAL  [ ] IN_PROGRESS  [ ] NOT_STARTED
-Part 3 (E15-E22): [ ] DONE  [ ] PARTIAL  [ ] IN_PROGRESS  [ ] NOT_STARTED
-Part 4 (FM+Domains): [ ] DONE  [ ] PARTIAL  [ ] IN_PROGRESS  [ ] NOT_STARTED
-Part 5 (Auth):    [ ] DONE  [ ] PARTIAL  [ ] IN_PROGRESS  [ ] NOT_STARTED
-Part 6 (Payments): [ ] DONE  [ ] PARTIAL  [ ] IN_PROGRESS  [ ] NOT_STARTED
-Part 7 (Verify):  [ ] DONE  [ ] PARTIAL  [ ] IN_PROGRESS  [ ] NOT_STARTED
-Part 8 (Entry):   [ ] DONE  [ ] PARTIAL  [ ] IN_PROGRESS  [ ] NOT_STARTED
-
-## PARTIAL/MISSING Items (Rectification List)
-<!-- agent fills: item name, file:line, what is wrong, what fix needed -->
+Part 1-8: NOT_STARTED (ad-hoc fix, not standard audit→plan→implement cycle)
 
 ## Completed This Session
-<!-- agent fills: structured list with commit hashes -->
-
-## Escalated Items (require human action)
-<!-- agent fills: what human must do manually -->
-
-## TSC Status
-Last run: [timestamp]
-Result: [EXIT 0 | ERRORS: N]
-Last error summary: [none | paste first error]
-
-## Test Status
-Last full test run: [timestamp]
-Result: [N passed / M failed]
-Regression baseline: [N tests before this session]
+- PLAN-SEARXNG-001: Added MCPO_SEARXNG valve (L34) + searxng endpoint (L48) in pipe-agent.py
+- Deployed to Hetzner via rsync
+- Valves configured in Open WebUI Admin → DB confirmed
+- All 4 mcpo endpoints verified reachable (HTTP 200)
 
 ## Files Changed This Session
-<!-- agent fills: list with commit hashes -->
-
-## Commits This Session
-<!-- agent fills: hash + message for each -->
+- projects/telegram-bot/pipe-agent.py (+2 lines: L34, L48)
 
 ## Session Handover Note
-<!-- agent fills when stopping: what the NEXT fresh agent must know that
-     is NOT captured in the tracker fields above — context, warnings,
-     discovered issues, things that surprised you -->
+Fix complete. Telegram bot tools should now work. If tools still report unavailable after testing, check: (1) Open WebUI restarted/reloaded to pick up valve changes, (2) mcpo services running (`systemctl status basic-memory mcp-tools`), (3) pipe logs in Open WebUI for tool discovery errors.
