@@ -27,16 +27,16 @@ scp "${SCRIPT_DIR}/config/searxng/mcp_server.py" "root@${TARGET}:/opt/searxng/"
 
 # === Systemd — clean units (no secrets) ===
 echo "  → Systemd units..."
-scp "${SCRIPT_DIR}/config/systemd/basic-memory.service" "root@${TARGET}:/etc/systemd/system/"
-scp "${SCRIPT_DIR}/config/systemd/ollama.service" "root@${TARGET}:/etc/systemd/system/"
+scp "${SCRIPT_DIR}/config/basic-memory/basic-memory.service" "root@${TARGET}:/etc/systemd/system/"
+scp "${SCRIPT_DIR}/config/ollama/ollama.service" "root@${TARGET}:/etc/systemd/system/"
 
 # === Secrets — to their actual server locations ===
 echo "  → Secrets..."
-scp "${SCRIPT_DIR}/secrets/mcpo-tools.json" "root@${TARGET}:/root/.mcpo-tools.json"
-scp "${SCRIPT_DIR}/secrets/mcp-tools.service" "root@${TARGET}:/etc/systemd/system/"
-scp "${SCRIPT_DIR}/secrets/telegram-bot.service" "root@${TARGET}:/etc/systemd/system/"
-scp "${SCRIPT_DIR}/secrets/open-webui.env" "root@${TARGET}:${REMOTE_PATH}/projects/open-webui/.env"
-scp "${SCRIPT_DIR}/secrets/basic-memory-config.json" "root@${TARGET}:/root/.basic-memory/config.json"
+scp "${SCRIPT_DIR}/secrets/mcp-tools/.mcpo-tools.json" "root@${TARGET}:/root/.mcpo-tools.json"
+scp "${SCRIPT_DIR}/secrets/mcp-tools/mcp-tools.service" "root@${TARGET}:/etc/systemd/system/"
+scp "${SCRIPT_DIR}/secrets/telegram-bot/telegram-bot.service" "root@${TARGET}:/etc/systemd/system/"
+scp "${SCRIPT_DIR}/secrets/open-webui/.env" "root@${TARGET}:${REMOTE_PATH}/projects/open-webui/.env"
+scp "${SCRIPT_DIR}/secrets/basic-memory/config.json" "root@${TARGET}:/root/.basic-memory/config.json"
 
 # === Reload systemd and restart affected services ===
 echo "  → Reloading systemd and restarting services..."

@@ -50,7 +50,7 @@ Then reload Caddy: `make proxy-reload` from the workspace root.
 
 ## Memory Server (Basic Memory via MCP)
 
-Open WebUI connects to [`basic-memory`](https://github.com/basicmachines-co/basic-memory) — a local-first knowledge engine that stores memories as `.md` files on the VPS at `/data/vault/`. Uses Open WebUI's **native MCP (Streamable HTTP)** integration — no adapters needed.
+Open WebUI connects to [`basic-memory`](https://github.com/basicmachines-co/basic-memory) — a local-first knowledge engine that stores memories as `.md` files on the VPS at `/opt/ai-lab/data/vault/`. Uses Open WebUI's **native MCP (Streamable HTTP)** integration — no adapters needed.
 
 **Status**: Running as `basic-memory.service` (systemd), MCP on port `8000`.
 
@@ -75,7 +75,7 @@ Open WebUI connects to [`basic-memory`](https://github.com/basicmachines-co/basi
 ```
 Open WebUI (Docker) ──MCP Streamable HTTP──▶ basic-memory (:8000)
                                                     │
-                                            /data/vault/
+                                     /opt/ai-lab/data/vault/
                                             ├── Personal/
                                             └── Projects/
 ```
@@ -92,9 +92,9 @@ Add to your model's system prompt (**Admin → Settings → Models → edit mode
 
 ```bash
 ssh hetzner-ailab
-ls /data/vault/Personal/   # Personal memories
-ls /data/vault/Projects/   # Project-specific notes
-vim /data/vault/Personal/preferences.md  # Edit directly
+ls /opt/ai-lab/data/vault/Personal/   # Personal memories
+ls /opt/ai-lab/data/vault/Projects/   # Project-specific notes
+vim /opt/ai-lab/data/vault/Personal/preferences.md  # Edit directly
 ```
 
 ### Service Management

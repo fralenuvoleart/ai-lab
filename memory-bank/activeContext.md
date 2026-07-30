@@ -52,6 +52,13 @@ AI-LAB deployed on Hetzner VPS with shared infrastructure running (Caddy, Postgr
   - **STACK.md** and **SEARXNG.md** docs updated
   - Architecture: Telegram → bot → Pipe → model + tools (memory, github, fetch, searxng). Web UI uses native tool handling. Two independent paths.
   - RAM: 2.4GB used, 1.4GB free. 13 engines active.
+- **2026-07-30**: Config consolidation and fixes:
+  - Data consolidated: `projects/open-webui/data/` → `/opt/ai-lab/data/open-webui/`
+  - Config convention: `config/` and `secrets/` grouped by service (basic-memory, mcp-tools, ollama, open-webui, searxng, telegram-bot)
+  - Pipe agent XML parsing: 3 regex patterns handle all model output formats (nested, self-closing, bare opening)
+  - Tool parameter schemas resolved via `$ref` in OpenAPI specs — no hardcoded params needed
+  - Bot timeout increased 30s → 120s for multi-tool execution
+  - Memory index rebuilt after workspace migration caused empty DB
 - **2026-07-30**: Workspace config migration complete:
   - All server configs migrated to `config/` in git repo (SearXNG, systemd, basic-memory, ollama)
   - Real secrets encrypted with git-crypt in `secrets/` (GPG key: 91EA0175D20A372B)

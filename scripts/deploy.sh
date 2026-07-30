@@ -30,8 +30,8 @@ echo "🚀 Deploying to ${REMOTE_USER}@${TARGET}:${REMOTE_PATH} ..."
 # === STEP 1: Pull knowledge assets FROM server (backup direction) ===
 echo "📥 Pulling knowledge assets from server (backup)..."
 rsync -avzu ${REMOTE_USER}@${TARGET}:${REMOTE_PATH}/data/vault/ "$(dirname "$0")/../data/vault/" || true
-rsync -avzu ${REMOTE_USER}@${TARGET}:${REMOTE_PATH}/projects/open-webui/data/webui.db "$(dirname "$0")/../projects/open-webui/data/" || true
-rsync -avzu ${REMOTE_USER}@${TARGET}:${REMOTE_PATH}/projects/open-webui/data/uploads/ "$(dirname "$0")/../projects/open-webui/data/uploads/" || true
+rsync -avzu ${REMOTE_USER}@${TARGET}:${REMOTE_PATH}/data/open-webui/webui.db "$(dirname "$0")/../projects/open-webui/data/" || true
+rsync -avzu ${REMOTE_USER}@${TARGET}:${REMOTE_PATH}/data/open-webui/uploads/ "$(dirname "$0")/../projects/open-webui/data/uploads/" || true
 
 # === STEP 2: Push code + configs TO server (deploy direction) ===
 echo "📤 Pushing code and configs to server (deploy)..."

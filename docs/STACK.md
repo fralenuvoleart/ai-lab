@@ -16,7 +16,7 @@
 
 | Service | Command | Port | Purpose |
 |---------|---------|------|---------|
-| `basic-memory` | `mcpo → basic-memory mcp` | 8000 | Persistent memory (`.md` in `/data/vault/`) |
+| `basic-memory` | `mcpo → basic-memory mcp` | 8000 | Persistent memory (`.md` in `/opt/ai-lab/data/vault/`) |
 | `mcp-tools` | `mcpo → fetch + github + searxng` | 8001 | Web fetch + GitHub + SearXNG |
 | `telegram-bot` | Python → Open WebUI API | — | Telegram ↔ AI chat bridge |
 
@@ -60,12 +60,15 @@ Full list: [`docs/SEARXNG-ENGINES.md`](SEARXNG-ENGINES.md)
 
 ```
 /opt/ai-lab/              — Workspace (git repo, rsync'd from dev machine)
-/opt/ai-lab/config/       — All server configs (SearXNG, systemd, basic-memory, ollama)
-/opt/ai-lab/data/vault/   — Basic Memory vault (Personal/ + Projects/)
-/opt/ai-lab/secrets/      — git-crypt encrypted real tokens
+/opt/ai-lab/config/       — All server configs grouped by service:
+                            basic-memory/ mcp-tools/ ollama/ open-webui/ searxng/ telegram-bot/
+/opt/ai-lab/data/         — Consolidated data:
+                            open-webui/ (webui.db, uploads, vector_db, cache)
+                            vault/ (Basic Memory notes)
+/opt/ai-lab/secrets/      — git-crypt encrypted secrets, same service grouping as config/
 /opt/searxng/             — SearXNG docker-compose + symlinks → /opt/ai-lab/config/searxng/
-/root/.basic-memory/      — basic-memory SQLite DB + config
-/root/.mcpo-tools.json    — mcpo multi-server config (fetch + github + searxng)
+/root/.basic-memory/      — basic-memory SQLite DB (config at /opt/ai-lab/secrets/basic-memory/)
+/root/.mcpo-tools.json    — mcpo config (source: /opt/ai-lab/secrets/mcp-tools/)
 ```
 
 ## Service Management

@@ -19,8 +19,8 @@ tar -czf "${BACKUP_FILE}" \
     --exclude='.git' \
     --exclude='*.log' \
     --exclude='__pycache__' \
-    /data/vault \
-    /opt/ai-lab/projects/open-webui/data/webui.db \
+    /opt/ai-lab/data/vault \
+    /opt/ai-lab/data/open-webui/webui.db \
     /opt/ai-lab/.env \
     /opt/ai-lab/projects/open-webui/.env \
     /root/.basic-memory/config.json \

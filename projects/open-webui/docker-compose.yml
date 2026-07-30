@@ -11,7 +11,7 @@ services:
       # Bound to localhost only — access via SSH tunnel or Caddy reverse proxy
       - "127.0.0.1:${WEBUI_PORT:-3000}:8080"
     volumes:
-      - ./data:/app/backend/data
+      - /opt/ai-lab/data/open-webui:/app/backend/data
     # Resolve host.docker.internal on Linux so Ollama connections work
     extra_hosts:
       - "host.docker.internal:host-gateway"
