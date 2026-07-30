@@ -1,0 +1,14 @@
+[Unit]
+Description=Basic Memory (mcpo OpenAPI bridge)
+After=network-online.target docker.service
+
+[Service]
+Type=simple
+User=root
+Environment=PATH=/root/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/root/.local/bin/mcpo --port 8000 --name "Basic Memory" -- /root/.local/bin/basic-memory mcp
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

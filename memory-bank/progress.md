@@ -12,6 +12,8 @@
 - [x] **2026-07-26**: pbservices.ge scraped — 150 clean .md pages (1.5 MB) to `shared/datasets/scraped/pbservices-en/`
 - [x] **2026-07-26**: Crawl4AI content cleaner finalized — excluded_tags + excluded_selector config
 
+- [x] **2026-07-30**: Workspace config migration complete — all server configs in git repo, secrets encrypted with git-crypt, vault + knowledge assets tracked, deploy scripts updated, old vault removed, zero regressions after service restarts.
+
 ## In Progress
 
 _None_

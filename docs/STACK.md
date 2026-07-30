@@ -50,21 +50,41 @@
 - **Tool IDs:** Hardcoded in bot (18 tools across memory/github/fetch/searxng)
 - **Prompt:** Inherited from `telegram-chat` model via API
 
-## SearXNG — 13 Active Engines
+## SearXNG — 27 Active Engines
 
-duckduckgo, brave, qwant, startpage, mojeek, yahoo, bing news, google news, wikidata, presearch, mwmbl, tusksearch, wiby
+brave, mwmbl, wiby, reddit, marginalia, lemmy communities, lemmy posts, lemmy comments, mastodon hashtags, mastodon users, tootfinder, neocities, rawweb, wikinews, sepiasearch, radio browser, yacy, searchmysite, ansa, tagesschau, il post, abcnyheter, hackernews, lobste.rs, boardreader, torch, sina
 
-Full list: [`docs/SEARXNG.md`](SEARXNG.md)
+Full list: [`docs/SEARXNG-ENGINES.md`](SEARXNG-ENGINES.md)
 
 ## Disk Layout
 
 ```
-/data/vault/          — Basic Memory vault (Personal/ + Projects/)
-/opt/ai-lab/          — Workspace (rsync'd from dev machine)
-/opt/searxng/         — SearXNG docker-compose + config
-/opt/repos/           — Reserved for git clones
-/root/.basic-memory/  — basic-memory config + SQLite DB
-/root/.mcpo-tools.json — mcpo multi-server config (fetch + github + searxng)
+/opt/ai-lab/              — Workspace (git repo, rsync'd from dev machine)
+/opt/ai-lab/config/       — All server configs (SearXNG, systemd, basic-memory, ollama)
+/opt/ai-lab/data/vault/   — Basic Memory vault (Personal/ + Projects/)
+/opt/ai-lab/secrets/      — git-crypt encrypted real tokens
+/opt/searxng/             — SearXNG docker-compose + symlinks → /opt/ai-lab/config/searxng/
+/root/.basic-memory/      — basic-memory SQLite DB + config
+/root/.mcpo-tools.json    — mcpo multi-server config (fetch + github + searxng)
+```
+
+## Service Management
+
+```bash
+# Docker
+docker ps
+cd /opt/searxng && docker compose restart
+
+# Systemd
+systemctl status basic-memory mcp-tools telegram-bot ollama
+journalctl -u telegram-bot -f
+
+# Deploy
+cd /opt/ai-lab && bash scripts/deploy.sh 167.233.42.140
+bash scripts/deploy-config.sh 167.233.42.140   # only if configs/secrets changed
+
+# Backups
+/opt/ai-lab/scripts/backup-full.sh
 ```
 
 ## Service Management

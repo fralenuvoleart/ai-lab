@@ -27,6 +27,14 @@ fi
 
 echo "🚀 Deploying to ${REMOTE_USER}@${TARGET}:${REMOTE_PATH} ..."
 
+# === STEP 1: Pull knowledge assets FROM server (backup direction) ===
+echo "📥 Pulling knowledge assets from server (backup)..."
+rsync -avzu ${REMOTE_USER}@${TARGET}:${REMOTE_PATH}/data/vault/ "$(dirname "$0")/../data/vault/" || true
+rsync -avzu ${REMOTE_USER}@${TARGET}:${REMOTE_PATH}/projects/open-webui/data/webui.db "$(dirname "$0")/../projects/open-webui/data/" || true
+rsync -avzu ${REMOTE_USER}@${TARGET}:${REMOTE_PATH}/projects/open-webui/data/uploads/ "$(dirname "$0")/../projects/open-webui/data/uploads/" || true
+
+# === STEP 2: Push code + configs TO server (deploy direction) ===
+echo "📤 Pushing code and configs to server (deploy)..."
 rsync -avz ${DRY_RUN} --delete \
     --exclude-from="${EXCLUDE_FILE}" \
     --exclude='.git' \
@@ -38,11 +46,16 @@ rsync -avz ${DRY_RUN} --delete \
     --exclude='infra/postgres/data/' \
     --exclude='infra/qdrant/storage/' \
     --exclude='projects/*/data/' \
+    --exclude='secrets/' \
+    --exclude='data/vault/' \
     --exclude='shared/venv-*/' \
     "$(dirname "$0")/../" \
     "${REMOTE_USER}@${TARGET}:${REMOTE_PATH}"
 
 echo ""
 echo "✅ Deploy complete."
+echo "   📥 Knowledge assets pulled from server (backup)."
+echo "   📤 Code + configs pushed to server (deploy)."
+echo "   🔐 If configs or secrets changed, run: bash scripts/deploy-config.sh"
 echo "   SSH into target: ssh ${REMOTE_USER}@${TARGET}"
 echo "   Start infra:     cd ${REMOTE_PATH} && make infra-up"

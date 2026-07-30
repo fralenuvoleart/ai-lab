@@ -1,0 +1,2 @@
+gemma2:2b
+llama3.2:1b

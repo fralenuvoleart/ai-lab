@@ -1,30 +1,38 @@
 # ANCHR IMPL TRACKER
-Last updated: 2026-07-30T03:03:31Z
-Context at last update: ~20%
+Last updated: 2026-07-30T06:41:00Z
+Context at last update: ~85%
 
 ## Current State
 MODE: IMPLEMENT
-ACTIVE_PART: N/A (ad-hoc fix outside standard Part structure)
-ACTIVE_ITEM: PLAN-SEARXNG-001 — COMPLETE
-LAST_ACTION: GATE_I3 COMPLETE — code deployed, valves configured, all 4 mcpo endpoints verified HTTP 200
-NEXT_ACTION: STOPPED — task complete. Human should test Telegram bot with /start + tool-using query.
+ACTIVE_PART: ALL PHASES COMPLETE
+ACTIVE_ITEM: PLAN-MIGRATION-001 — COMPLETE
+LAST_ACTION: GATE_I3 COMPLETE — Phase 4 done. deploy.sh updated with pull/push separation, deploy-config.sh created.
+NEXT_ACTION: STOPPED — migration fully complete. Human should test Telegram bot with live message.
 
 ## Protocol Gates Completed
 - [x] SESSION_START (step 1)
-- [x] GATE_I2 — file changed: pipe-agent.py:L34, L48 (step 2)
-- [x] GATE_I3 — COMPLETE: deploy verified, valves DB-confirmed, endpoints healthy (steps 3-4)
+- [x] GATE_I2 — Phase 1: files pulled, staged, git-crypt configured
+- [x] GATE_I3 — Phase 1: 314 files committed, encryption verified
+- [x] GATE_I2 — Phase 2: server backups, symlinks, path updates
+- [x] GATE_I3 — Phase 3: all 5 services healthy after restart
+- [x] GATE_I3 — Phase 4: deploy.sh + deploy-config.sh committed
 
-## Parts Status
-Part 1-8: NOT_STARTED (ad-hoc fix, not standard audit→plan→implement cycle)
-
-## Completed This Session
-- PLAN-SEARXNG-001: Added MCPO_SEARXNG valve (L34) + searxng endpoint (L48) in pipe-agent.py
-- Deployed to Hetzner via rsync
-- Valves configured in Open WebUI Admin → DB confirmed
-- All 4 mcpo endpoints verified reachable (HTTP 200)
-
-## Files Changed This Session
-- projects/telegram-bot/pipe-agent.py (+2 lines: L34, L48)
+## Git Commits
+- ad64ba0 feat(scripts): add bidirectional deploy with knowledge asset sync
+- efb984d fix(secrets): re-commit with correct git-crypt encryption
+- 01e9880 Add 1 git-crypt collaborator
+- a9b0916 feat(config): migrate all server configs, secrets, and knowledge assets into repo
 
 ## Session Handover Note
-Fix complete. Telegram bot tools should now work. If tools still report unavailable after testing, check: (1) Open WebUI restarted/reloaded to pick up valve changes, (2) mcpo services running (`systemctl status basic-memory mcp-tools`), (3) pipe logs in Open WebUI for tool discovery errors.
+All 4 phases complete. The workspace now contains:
+- config/ (14 files): SearXNG, systemd, basic-memory, ollama manifest, .example templates
+- secrets/ (6 files): git-crypt encrypted real tokens (GPG key: 91EA0175D20A372B)
+- data/vault/Personal/ (3 .md): AI memory files
+- projects/open-webui/data/webui.db + uploads/ (~150 files)
+- scripts/deploy.sh: pull data FROM server + push code TO server
+- scripts/deploy-config.sh: scp secrets + systemd units, reload+restart
+
+To use on another machine:
+1. git-crypt unlock (requires GPG private key)
+2. Run scripts/deploy.sh to push configs + pull latest data
+3. Run scripts/deploy-config.sh if secrets changed

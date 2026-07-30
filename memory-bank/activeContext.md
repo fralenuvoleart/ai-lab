@@ -52,3 +52,12 @@ AI-LAB deployed on Hetzner VPS with shared infrastructure running (Caddy, Postgr
   - **STACK.md** and **SEARXNG.md** docs updated
   - Architecture: Telegram → bot → Pipe → model + tools (memory, github, fetch, searxng). Web UI uses native tool handling. Two independent paths.
   - RAM: 2.4GB used, 1.4GB free. 13 engines active.
+- **2026-07-30**: Workspace config migration complete:
+  - All server configs migrated to `config/` in git repo (SearXNG, systemd, basic-memory, ollama)
+  - Real secrets encrypted with git-crypt in `secrets/` (GPG key: 91EA0175D20A372B)
+  - Vault moved from `/data/vault/` → `/opt/ai-lab/data/vault/` (tracked in git)
+  - Knowledge assets backed up: `webui.db` (9.4MB) + `uploads/` (~150 .md, 3.2MB)
+  - Deploy scripts updated: `deploy.sh` pulls data from server (backup), pushes code (deploy)
+  - `deploy-config.sh` created for secrets + systemd unit deployment
+  - Old vault `/data/vault/` removed, npm cache cleaned
+  - All 5 services healthy after migration, zero regressions

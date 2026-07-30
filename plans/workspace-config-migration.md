@@ -68,7 +68,7 @@
 ```
 AI-LAB/
 ├── secrets/                              # NEW: git-crypt encrypted — REAL tokens
-│   ├── .gitattributes                     # * filter=git-crypt diff=git-crypt
+│   ├── .gitattributes                     # * filter=git-crypt diff=git-crypt (with !filter !diff for .gitattributes itself)
 │   ├── mcpo-tools.json                   # real GITHUB_PAT
 │   ├── mcp-tools.service                 # real GITHUB_PAT in Environment=
 │   ├── telegram-bot.service              # real TELEGRAM_BOT_TOKEN + OWUI_API_KEY
@@ -245,7 +245,7 @@ projects/open-webui/data/webui.db-wal     # SQLite WAL journal
 
 ### Phase 0: Pre-Flight Verification (server, read-only)
 
-**Step 0.1** — Verify basic-memory `--vault-path` flag exists
+**Step 0.1** — Verify basic-memory `--path` flag exists
 ```bash
 ssh root@167.233.42.140 'basic-memory mcp --help | grep -i vault'
 ```
@@ -375,9 +375,9 @@ ln -sf /opt/ai-lab/config/searxng/limiter.toml /opt/searxng/limiter.toml
 
 **Step 2.4** — Update basic-memory for new vault path
 ```bash
-# Option A (if --vault-path confirmed in Step 0.1):
+# Option A (if --path confirmed in Step 0.1):
 # Edit /etc/systemd/system/basic-memory.service, add to ExecStart:
-#   --vault-path /opt/ai-lab/data/vault
+#   --path /opt/ai-lab/data/vault
 
 # Option B (fallback if flag doesn't exist):
 # ln -s /opt/ai-lab/data/vault /data/vault
@@ -565,12 +565,12 @@ Write a test note via basic-memory, verify it appears in `/opt/ai-lab/data/vault
 
 ### 7.1 basic-memory vault path change
 
-**Risk**: `--vault-path` flag may not exist.
+**Risk**: `--path` flag may not exist.
 **Mitigation**: Pre-flight verified in Step 0.1. Fallback: symlink `ln -s /opt/ai-lab/data/vault /data/vault`. Also update `config.json` `projects.main.path`.
 
 ### 7.2 basic-memory dual-source vault path
 
-**Risk**: Vault path in both systemd unit (`--vault-path`) and `config.json` (`projects.main.path`). Changing only one causes inconsistency.
+**Risk**: Vault path in both systemd unit (`--path`) and `config.json` (`projects.main.path`). Changing only one causes inconsistency.
 **Mitigation**: Step 2.4 updates both. Verify via basic-memory logs after restart.
 
 ### 7.3 Symlinked Docker files
@@ -656,7 +656,7 @@ Phase 4 (scripts) — deploy.sh (pull data + push code), deploy-config.sh (secre
 
 ## 10. Acceptance Criteria
 
-- [ ] Step 0.1: `--vault-path` flag confirmed or symlink fallback selected
+- [ ] Step 0.1: `--path` flag confirmed or symlink fallback selected
 - [ ] `git-crypt` initialized and `secrets/` encrypts correctly (verify: `git-crypt status`)
 - [ ] All 5 real secret files in `secrets/` with correct content
 - [ ] All `.example` templates in `config/` with placeholders (readable without GPG)

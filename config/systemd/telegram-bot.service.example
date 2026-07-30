@@ -1,0 +1,16 @@
+[Unit]
+Description=Telegram ↔ Open WebUI Bridge
+After=network-online.target docker.service
+
+[Service]
+Type=simple
+User=root
+Environment=PATH=/root/.local/bin:/usr/bin:/bin
+Environment=TELEGRAM_BOT_TOKEN=YOUR_TELEGRAM_BOT_TOKEN
+Environment=OWUI_API_KEY=YOUR_OWUI_API_KEY
+ExecStart=/root/.local/share/pipx/venvs/basic-memory/bin/python /opt/ai-lab/projects/telegram-bot/bot.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

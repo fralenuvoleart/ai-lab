@@ -1,0 +1,10 @@
+https://beforeitsnews.com/rss2/
+https://oc-media.org/feed/
+https://www.rt.com/rss/
+https://www.naturalnews.com/rss.xml
+https://news.ycombinator.com/rss
+https://www.aljazeera.com/xml/rss/all.xml
+https://sputnikglobe.com/export/rss2/archive/index.xml
+https://www.presstv.co.uk/RSS
+https://www.justiceinfo.net/en/feed
+https://feeds.feedburner.com/thetruthisnodefense
