@@ -8,9 +8,13 @@ from openai import AsyncOpenAI
 
 logger = logging.getLogger(__name__)
 
-# Match text-based tool calls: <TOOL_NAME>content</TOOL_NAME> or <TOOL_NAME args />
-_TEXT_TOOL_RE = re.compile(r"<(\w+)>(.*?)</\1>", re.DOTALL)
+# Match text-based tool calls:
+# <TOOL_NAME>content</TOOL_NAME> — nested content, no attrs
+# <TOOL_NAME attr="val">content</TOOL_NAME> — nested with attrs
+# <TOOL_NAME attr="val" /> — self-closing with attrs
+_TEXT_TOOL_RE = re.compile(r"<(\w+)(?:\s[^>]*)?>(.*?)</\1>", re.DOTALL)
 _SELF_CLOSING_RE = re.compile(r"<(\w+)([^>]*?)/>")
+_OPEN_TAG_ATTRS = re.compile(r'(\w+)="([^"]*)"')
 
 
 class Pipe:
@@ -46,18 +50,25 @@ class Pipe:
                 if r.status_code != 200:
                     continue
                 spec = r.json()
+                components = spec.get("components", {}).get("schemas", {})
                 for path, methods in spec.get("paths", {}).items():
                     for method, details in methods.items():
                         opid = details.get("operationId", "")
                         clean = opid.replace("tool_", "").replace("_post", "")
                         opid = f"{name}_{clean}" if clean else f"{name}_{path.strip('/').replace('/', '_')}"
-                        # Extract parameter schema from requestBody
-                        params_schema = {}
+                        # Extract parameter schema, resolving $ref
+                        params_schema = {"properties": {}, "required": []}
                         req_body = details.get("requestBody", {})
                         json_body = req_body.get("content", {}).get("application/json", {})
                         schema = json_body.get("schema", {})
-                        params_schema["properties"] = schema.get("properties", {})
-                        params_schema["required"] = schema.get("required", [])
+                        if "$ref" in schema:
+                            ref_name = schema["$ref"].split("/")[-1]
+                            ref_schema = components.get(ref_name, {})
+                            params_schema["properties"] = ref_schema.get("properties", {})
+                            params_schema["required"] = ref_schema.get("required", [])
+                        else:
+                            params_schema["properties"] = schema.get("properties", {})
+                            params_schema["required"] = schema.get("required", [])
                         path_map[opid] = (base_url, path, method.upper(), params_schema)
             except Exception:
                 logger.warning("MCP endpoint %s unreachable", name)
@@ -100,25 +111,25 @@ class Pipe:
             "You have access to these tools. To use a tool, output ONLY the XML tag.",
             "DO NOT output any text before or after the XML tags — just the tags.",
             "",
-            "Available tools:",
+            "Available tools (use EXACTLY these parameter names, * = required):",
         ]
         for tag, opid in sorted(tag_map.items()):
             _, _, _, schema = path_map.get(opid, ("", "", "", {}))
             props = schema.get("properties", {})
             reqs = schema.get("required", [])
-            arg_desc = ", ".join(
-                f"{k}={'*' if k in reqs else ''}{list(v.get('anyOf',[{}]))[0].get('type','str') if 'anyOf' in v else v.get('type','str')}"
-                for k, v in props.items()
-            )
+            if props:
+                arg_desc = ", ".join(
+                    f'{k}{"*" if k in reqs else ""}'
+                    for k in props
+                )
+            else:
+                arg_desc = ""
             lines.append(f"  <{tag.upper()}> — {opid}")
             if arg_desc:
-                lines.append(f"      args: {arg_desc}  (* = required)")
+                lines.append(f"      params: {arg_desc}")
         lines.append("")
-        lines.append("For tools with a 'query' parameter, nest the text: <TAG>text here</TAG>")
-        lines.append("For other tools, use attributes: <TAG key=\"value\" key2=\"value2\" />")
-        lines.append("")
-        lines.append("IMPORTANT: After you get tool results, provide your final answer.")
-        lines.append("Do NOT output any XML tags in your final response.")
+        lines.append("Use attributes: <TAG param=\"value\" /> or nest content: <TAG>text</TAG>")
+        lines.append("IMPORTANT: After tool results, provide final answer. NO XML tags in final response.")
         return "\n".join(lines)
 
     def _extract_text_tool_calls(self, content: str, tag_map: dict) -> list[dict]:
@@ -127,28 +138,30 @@ class Pipe:
         # First try self-closing: <tool key="val" />
         for m in _SELF_CLOSING_RE.finditer(content):
             tag = m.group(1).lower()
-            attrs = dict(re.findall(r'(\w+)="([^"]*)"', m.group(2)))
+            attrs = dict(_OPEN_TAG_ATTRS.findall(m.group(2)))
             if tag in tag_map:
                 calls.append({"tool": tag_map[tag], "args": attrs})
-        # Then try nested: <TOOL>content</TOOL>
+        # Then try nested: <TOOL attr="val">content</TOOL> or <TOOL>content</TOOL>
         for m in _TEXT_TOOL_RE.finditer(content):
+            full_match = m.group(0)
             tag = m.group(1).lower()
             inner = m.group(2).strip()
             if tag in ("query",):
                 continue
             if tag not in tag_map:
                 continue
-            args = {}
-            # Extract sub-elements
+            # Extract attributes from opening tag: <TAG attr="val">
+            args = dict(_OPEN_TAG_ATTRS.findall(full_match[:full_match.index(">")]))
+            # Extract sub-elements from inner content
             for sm in _TEXT_TOOL_RE.finditer(inner):
                 sub_tag = sm.group(1).lower()
                 sub_val = sm.group(2).strip()
                 args[sub_tag] = sub_val
             # Also try self-closing in inner
             for sm in _SELF_CLOSING_RE.finditer(inner):
-                sub_attrs = dict(re.findall(r'(\w+)="([^"]*)"', sm.group(2)))
+                sub_attrs = dict(_OPEN_TAG_ATTRS.findall(sm.group(2)))
                 args.update(sub_attrs)
-            # If no sub-elements found, treat inner text as the first arg
+            # If no args found, treat inner text as query
             if not args and inner:
                 args["query"] = inner
             calls.append({"tool": tag_map[tag], "args": args})
