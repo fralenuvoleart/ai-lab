@@ -19,7 +19,7 @@
 
 ## In Progress
 
-_None_
+- [x] **2026-07-30**: RSS Reader MCP installed — `rss-reader-mcp` v1.0.8 via mcpo on port 8001/rss-reader, 2 tools (fetch_feed_entries, fetch_article_content), verified with Hacker News feed
 
 
 ## Upcoming

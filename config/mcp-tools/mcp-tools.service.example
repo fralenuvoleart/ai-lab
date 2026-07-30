@@ -1,5 +1,5 @@
 [Unit]
-Description=MCP Tools (Fetch + GitHub via mcpo)
+Description=MCP Tools (Fetch + GitHub + SearXNG + RSS via mcpo)
 After=network-online.target docker.service
 
 [Service]

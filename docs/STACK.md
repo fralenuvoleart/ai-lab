@@ -28,6 +28,7 @@
 | GitHub | `http://host.docker.internal:8001/github` | 7 (search_repositories, get_file_contents, create_or_update_file, search_code, list_commits, list_issues, get_issue) |
 | Fetch | `http://host.docker.internal:8001/fetch` | 1 (fetch) |
 | SearXNG | `http://host.docker.internal:8001/searxng` | 1 (search_web) |
+| RSS Reader | `http://host.docker.internal:8001/rss-reader` | 2 (fetch_feed_entries, fetch_article_content) |
 
 ## Open WebUI Functions
 

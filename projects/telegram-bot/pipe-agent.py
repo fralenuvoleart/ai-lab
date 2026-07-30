@@ -27,6 +27,7 @@ class Pipe:
         MCPO_GITHUB: str = Field(default="", description="GitHub mcpo URL")
         MCPO_FETCH: str = Field(default="", description="Fetch mcpo URL")
         MCPO_SEARXNG: str = Field(default="", description="SearXNG mcpo URL")
+        MCPO_RSS: str = Field(default="", description="RSS Reader mcpo URL")
 
     def __init__(self):
         self.type = "pipe"
@@ -41,6 +42,7 @@ class Pipe:
             ("github", self.valves.MCPO_GITHUB),
             ("fetch", self.valves.MCPO_FETCH),
             ("searxng", self.valves.MCPO_SEARXNG),
+            ("rss-reader", self.valves.MCPO_RSS),
         ]
         for name, url in endpoints:
             if not url:

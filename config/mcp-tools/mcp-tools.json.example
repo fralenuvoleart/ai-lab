@@ -18,6 +18,13 @@
       "args": [
         "/opt/ai-lab/config/searxng/mcp_server.py"
       ]
+    },
+    "rss-reader": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "rss-reader-mcp"
+      ]
     }
   }
 }

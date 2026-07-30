@@ -68,3 +68,9 @@ AI-LAB deployed on Hetzner VPS with shared infrastructure running (Caddy, Postgr
   - `deploy-config.sh` created for secrets + systemd unit deployment
   - Old vault `/data/vault/` removed, npm cache cleaned
   - All 5 services healthy after migration, zero regressions
+- **2026-07-30**: RSS Reader MCP installed:
+  - `rss-reader-mcp` v1.0.8 npm package added to mcpo on port 8001
+  - 2 tools exposed: `fetch_feed_entries` (RSS/Atom parsing) + `fetch_article_content` (full article → Markdown)
+  - Added as 4th MCP server in `/root/.mcpo-tools.json` alongside fetch, github, searxng
+  - Endpoint: `http://host.docker.internal:8001/rss-reader`
+  - Verified: Hacker News feed returns live articles
