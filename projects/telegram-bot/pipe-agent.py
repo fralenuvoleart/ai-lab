@@ -9,11 +9,12 @@ from openai import AsyncOpenAI
 logger = logging.getLogger(__name__)
 
 # Match text-based tool calls:
-# <TOOL_NAME>content</TOOL_NAME> — nested content, no attrs
-# <TOOL_NAME attr="val">content</TOOL_NAME> — nested with attrs
-# <TOOL_NAME attr="val" /> — self-closing with attrs
+# <TOOL_NAME>content</TOOL_NAME> — nested
+# <TOOL_NAME attr="val"> — opening with attrs (no close needed)
+# <TOOL_NAME attr="val" /> — self-closing
 _TEXT_TOOL_RE = re.compile(r"<(\w+)(?:\s[^>]*)?>(.*?)</\1>", re.DOTALL)
 _SELF_CLOSING_RE = re.compile(r"<(\w+)([^>]*?)/>")
+_BARE_OPEN_RE = re.compile(r"<(\w+)(\s[^>]*)?>")
 _OPEN_TAG_ATTRS = re.compile(r'(\w+)="([^"]*)"')
 
 
@@ -141,6 +142,14 @@ class Pipe:
             attrs = dict(_OPEN_TAG_ATTRS.findall(m.group(2)))
             if tag in tag_map:
                 calls.append({"tool": tag_map[tag], "args": attrs})
+        # Try bare opening: <tool key="val"> (no close tag)
+        for m in _BARE_OPEN_RE.finditer(content):
+            tag = m.group(1).lower()
+            attrs_part = m.group(2) or ""
+            attrs = dict(_OPEN_TAG_ATTRS.findall(attrs_part))
+            # Skip if this tag also matches self-closing or nested (avoid dupes)
+            if attrs and tag in tag_map:
+                calls.append({"tool": tag_map[tag], "args": attrs})
         # Then try nested: <TOOL attr="val">content</TOOL> or <TOOL>content</TOOL>
         for m in _TEXT_TOOL_RE.finditer(content):
             full_match = m.group(0)
@@ -223,9 +232,9 @@ class Pipe:
                 content = response.choices[0].message.content or ""
 
             # Strip any remaining XML and make one final synthesis call if needed
-            if _TEXT_TOOL_RE.search(content) or _SELF_CLOSING_RE.search(content):
+            if _TEXT_TOOL_RE.search(content) or _SELF_CLOSING_RE.search(content) or _BARE_OPEN_RE.search(content):
                 logger.info("XML still in output after %d loops — stripping and re-prompting", 5 - max_loops)
-                clean = _TEXT_TOOL_RE.sub("", _SELF_CLOSING_RE.sub("", content)).strip()
+                clean = _BARE_OPEN_RE.sub("", _TEXT_TOOL_RE.sub("", _SELF_CLOSING_RE.sub("", content))).strip()
                 messages.append({"role": "assistant", "content": clean})
                 messages.append({"role": "user", "content": "Synthesize the tool results above into a clear final answer. Do NOT use ANY XML tags. Just write the answer in natural language."})
                 response = await api_client.chat.completions.create(
