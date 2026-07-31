@@ -41,3 +41,6 @@ Thumbs.db
 *.mp4
 *.avi
 *.mov
+
+# Data directory (uploads, vault, etc.)
+data/
