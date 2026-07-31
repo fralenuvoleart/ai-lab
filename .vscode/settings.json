@@ -44,6 +44,9 @@
     "editor.defaultFormatter": "ms-python.black-formatter"
   },
   "python.languageServer": "Pyright",
+  "python.defaultInterpreterPath": "/usr/bin/python3.14",
+  "python.pythonPath": "/usr/bin/python3.14",
+  "python.useEnvironmentsExtension": false,
   "[markdown]": {
     "editor.defaultFormatter": "yzhang.markdown-all-in-one"
   },
