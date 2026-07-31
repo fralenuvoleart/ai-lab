@@ -28,8 +28,10 @@ tar -czf "${BACKUP_FILE}" \
     /root/.mcpo-tools.json \
     /etc/systemd/system/basic-memory.service \
     /etc/systemd/system/mcp-tools.service \
-    /opt/ai-lab/infra/caddy/Caddyfile \
-    2>/dev/null
+    /opt/ai-lab/infra/caddy/Caddyfile
+
+# Verify backup integrity — set -e already aborts on tar failure, stderr now visible
+sha256sum "${BACKUP_FILE}" > "${BACKUP_FILE}.sha256"
 
 echo "✅ Backup complete: ${BACKUP_FILE}"
 echo "   Size: $(du -h "${BACKUP_FILE}" | cut -f1)"

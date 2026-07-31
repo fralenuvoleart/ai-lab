@@ -84,7 +84,7 @@ Do not guess, speculate, extrapolate, or assume.
 - Before declaring a task finished, review the rules above and perform a silent "Pass/Fail" verification.
 - If a "Fail" is identified on any constraint or quality check, correct it before completing the session.
 
-<!--
+
 # ANCHR — AI Agent Guard Protocol
 
 This repository uses Anchr to enforce audit integrity and prevent agent drift.
@@ -116,4 +116,5 @@ The human must confirm your session plan before you write a single line.
 
 Full operating contract: .anchr/manifesto.md
 Session entry point: .anchr/start.md
+ <!--
  -->

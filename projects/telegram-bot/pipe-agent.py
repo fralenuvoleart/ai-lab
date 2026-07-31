@@ -74,8 +74,12 @@ class Pipe:
                             params_schema["properties"] = schema.get("properties", {})
                             params_schema["required"] = schema.get("required", [])
                         path_map[opid] = (base_url, path, method.upper(), params_schema)
-            except Exception:
-                logger.warning("MCP endpoint %s unreachable", name)
+            except httpx.HTTPError:
+                logger.warning("MCP endpoint %s HTTP error", name)
+            except json.JSONDecodeError:
+                logger.warning("MCP endpoint %s returned invalid JSON", name)
+            except OSError:
+                logger.warning("MCP endpoint %s unreachable (network error)", name)
         return path_map
 
     async def _execute_tool(self, client: httpx.AsyncClient, opid: str, args: dict, path_map: dict) -> str:
@@ -84,8 +88,12 @@ class Pipe:
         base_url, path, method, _ = path_map[opid]
         try:
             r = await client.request(method, f"{base_url}{path}", json=args, timeout=15.0)
-            result = r.text[:1000]
-            logger.info("Tool %s(%s) => HTTP %s, %d chars", opid, args, r.status_code, len(result))
+            full_text = r.text
+            if len(full_text) > 1000:
+                result = full_text[:1000] + f" [truncated — showing first 1000 of {len(full_text)} chars]"
+            else:
+                result = full_text
+            logger.info("Tool %s(%s) => HTTP %s, %d chars (total: %d)", opid, args, r.status_code, len(result), len(full_text))
             return result
         except Exception as e:
             logger.error("Tool %s(%s) failed: %s", opid, args, e)

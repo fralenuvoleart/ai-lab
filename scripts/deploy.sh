@@ -29,9 +29,10 @@ echo "🚀 Deploying to ${REMOTE_USER}@${TARGET}:${REMOTE_PATH} ..."
 
 # === STEP 1: Pull knowledge assets FROM server (backup direction) ===
 echo "📥 Pulling knowledge assets from server (backup)..."
-rsync -avzu ${REMOTE_USER}@${TARGET}:${REMOTE_PATH}/data/vault/ "$(dirname "$0")/../data/vault/" || true
-rsync -avzu ${REMOTE_USER}@${TARGET}:${REMOTE_PATH}/data/open-webui/webui.db "$(dirname "$0")/../data/open-webui/" || true
-rsync -avzu ${REMOTE_USER}@${TARGET}:${REMOTE_PATH}/data/open-webui/uploads/ "$(dirname "$0")/../data/open-webui/uploads/" || true
+# Non-critical pulls — log warnings on failure but continue deployment
+rsync -avzu ${REMOTE_USER}@${TARGET}:${REMOTE_PATH}/data/vault/ "$(dirname "$0")/../data/vault/" || echo "⚠️  WARNING: vault pull failed (exit $?) — continuing"
+rsync -avzu ${REMOTE_USER}@${TARGET}:${REMOTE_PATH}/data/open-webui/webui.db "$(dirname "$0")/../data/open-webui/" || echo "⚠️  WARNING: webui.db pull failed (exit $?) — continuing"
+rsync -avzu ${REMOTE_USER}@${TARGET}:${REMOTE_PATH}/data/open-webui/uploads/ "$(dirname "$0")/../data/open-webui/uploads/" || echo "⚠️  WARNING: uploads pull failed (exit $?) — continuing"
 
 # === STEP 2: Push code + configs TO server (deploy direction) ===
 echo "📤 Pushing code and configs to server (deploy)..."
