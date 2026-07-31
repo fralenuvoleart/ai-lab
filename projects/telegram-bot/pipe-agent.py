@@ -28,7 +28,7 @@ class Pipe:
         MCPO_FETCH: str = Field(default="", description="Fetch mcpo URL")
         MCPO_SEARXNG: str = Field(default="", description="SearXNG mcpo URL")
         MCPO_RSS: str = Field(default="", description="RSS Reader mcpo URL")
-
+        MCPO_TWITTER: str = Field(default="", description="Twitter API mcpo URL")
     def __init__(self):
         self.type = "pipe"
         self.id = "telegram-agent"
@@ -43,6 +43,7 @@ class Pipe:
             ("fetch", self.valves.MCPO_FETCH),
             ("searxng", self.valves.MCPO_SEARXNG),
             ("rss-reader", self.valves.MCPO_RSS),
+            ("twitterapi-io", self.valves.MCPO_TWITTER),
         ]
         for name, url in endpoints:
             if not url:

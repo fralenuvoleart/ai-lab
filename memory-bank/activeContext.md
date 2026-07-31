@@ -74,3 +74,9 @@ AI-LAB deployed on Hetzner VPS with shared infrastructure running (Caddy, Postgr
   - Added as 4th MCP server in `/root/.mcpo-tools.json` alongside fetch, github, searxng
   - Endpoint: `http://host.docker.internal:8001/rss-reader`
   - Verified: Hacker News feed returns live articles
+- **2026-07-31**: Twitter API MCP installed:
+  - `@kaitoinfra/twitterapi-io-mcp-server` npm package added to mcpo on port 8001
+  - 12 read-only tools exposed: search_tweets, get_user_info, get_user_about, get_user_followers, get_user_followings, get_user_last_tweets, get_user_mentions, get_tweets_by_ids, get_tweet_replies, get_tweet_quotes, get_tweet_retweeters, get_trends
+  - Requires `TWITTERAPI_IO_API_KEY` env var (twitterapi.io, User ID: 473723760672661504)
+  - Endpoint: `http://host.docker.internal:8001/twitterapi-io`
+  - Verified: service running, OpenAPI spec returns all 12 tools

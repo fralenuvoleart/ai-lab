@@ -11,18 +11,6 @@ __pycache__/
 **/*.sqlite
 *.db
 
-# Security & secrets
-**/.env
-**/.env.local
-**/secrets/
-*.pem
-*.key
-*secret*
-*credential*
-id_rsa*
-*.p12
-*.pfx
-
 # Git
 .git/
 

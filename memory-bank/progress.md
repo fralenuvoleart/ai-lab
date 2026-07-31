@@ -20,6 +20,7 @@
 ## In Progress
 
 - [x] **2026-07-30**: RSS Reader MCP installed — `rss-reader-mcp` v1.0.8 via mcpo on port 8001/rss-reader, 2 tools (fetch_feed_entries, fetch_article_content), verified with Hacker News feed
+- [x] **2026-07-31**: Twitter API MCP installed — `@kaitoinfra/twitterapi-io-mcp-server` via mcpo on port 8001/twitterapi-io, 12 tools (search_tweets, get_user_info, get_user_followers, get_trends, etc.), twitterapi.io API key configured
 
 
 ## Upcoming
