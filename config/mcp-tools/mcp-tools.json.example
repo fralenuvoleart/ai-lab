@@ -30,7 +30,7 @@
       "command": "npx",
       "args": [
         "-y",
-        "@kaitoinfra/twitterapi-io-mcp-server"
+        "@twitterapi_io/mcp-server"
       ],
       "env": {
         "TWITTERAPI_IO_API_KEY": "YOUR_TWITTERAPI_IO_API_KEY"

@@ -5,6 +5,16 @@
 
 ---
 
+## 🐦 Twitter
+
+> Use `get_user_last_tweets` or `search_tweets` (`from:USERNAME`) for these. Returns latest posts per account.
+
+| # | Handle | Region | Focus |
+|---|--------|--------|-------|
+| 1 | RealCandaceO | Western Countries | Politics, commentary |
+
+---
+
 ## 🔍 Searches
 
 > Use web search tool for these. Queries target local/regional stories that RSS feeds may miss.
@@ -60,3 +70,6 @@
 | 3 | https://civil.ge/ | Georgia 🇬🇪 | Georgian politics, civil society |
 | 4 | https://agenda.ge/ | Georgia 🇬🇪 | Georgian news, economy, culture |
 | 5 | https://www.georgianjournal.ge/ | Georgia 🇬🇪 | Georgian news, business, culture |
+
+---
+
