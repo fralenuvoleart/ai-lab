@@ -31,18 +31,19 @@ Read `sources.md` (or attached `News Sources` Knowledge document). It has four s
 ### 2. Fetch Sources
 Process in this order:
 
-**A. Twitter Posts** — For each Twitter handle in `sources.md`:
-- Fetch the latest post using `get_user_last_tweets`. Returns 1 tweet per call; paginate with `cursor` for more.
+**A. Twitter Posts** — Fetch in total the latest 10 post:
+For each Twitter handle in `sources.md`:
+-  using `get_user_last_tweets`. Returns 1 tweet per call with 20 posts;
 - For broader timeline scanning, use `search_tweets` with `from:USERNAME` query and `queryType: Latest`.
 - Tag tweets with their region/category. Include notable tweets in the digest's relevant regional section.
 
 **B. Searches** — For each query in the Searches table:
-- Execute web search. Tag results with their region. Max 10 results per query.
+- Execute web search. Tag results with their region. **Max 10 results** per query.
 
 **C. RSS Feeds** — For each URL in the RSS Feeds table:
 - Take the **5 most recent articles** per feed. Use RSS feed tool (e.g., `fetch_feed_entries` or `rss`). Tag articles with their region. Skip failing feeds and record them.
 
-**D. Websites** — On-demand only. After searches and RSS feeds are processed, check coverage:
+**D. Websites** — On-demand only. After twitter, searches and RSS feeds are processed, check coverage:
 - Do Italy 🇮🇹 and Georgia 🇬🇪 each have at least 1 article?
 - If a priority country is empty, fetch from the Websites table for that specific country only.
 - Stop when priority countries are covered or all website sources are exhausted.
@@ -52,18 +53,21 @@ Apply these criteria to the combined pool:
 
 **Mandatory filters:**
 - **Freshness**: Published within the last 48 hours.
-- **Language**: English only.
+- **Language**: English.
 - **Quality**: Skip clickbait, duplicates, and stub articles.
 
+**Maximum number of total results:**
+- Target 25–30 articles total. Do not pad with lower-quality articles. If more than 30 pass, select the 30 most **topically** and **regionally** diverse.
+
 **Selection Goal:**
-- Target 25–30 articles. Do not pad with lower-quality articles. If more than 30 pass, select the 30 most regionally and topically diverse.
-- **Geographic balance**: Ensure every inhabited continent is represented. Boost underrepresented regions if missing.
+- Target 25–30 articles total. Do not pad with lower-quality articles. If more than 30 pass, select the 30 most regionally and topically diverse.
+- **News balance**: Ensure every continent and topic are represented. Boost underrepresented regions and topics if missing.
 - **Priority countries** (Italy 🇮🇹, Georgia 🇬🇪): Include at least one story from each if available.
 
 ### 4. Extract Thumbnails
 For each selected article:
 - Extract the lead image URL from feed metadata, OpenGraph tags, or main article body.
-- If no image is found, mark as `🖼️ No Image`.
+- If no image is found, mark as `No Image`.
 
 ### 5. Format Output
 Output strictly as Markdown, grouped by region using 3-column tables.
@@ -90,17 +94,14 @@ Output strictly as Markdown, grouped by region using 3-column tables.
 > - {feed URL} — {reason}
 
 **Formatting rules:**
-- **Thumbnail column**: Use standard Markdown image syntax `![Thumbnail](IMAGE_URL)`. If no image exists, use plain text `🖼️ No Image`.
+- **Thumbnail column**: Use standard Markdown image syntax `![Thumbnail](IMAGE_URL)`. If no image exists, use plain text `No Image`.
 - **Headline column**: Bold linked headline on line 1, then `<br>` + 1-sentence summary on line 2.
 - **Source column**: Bold source name on line 1, then `<br>` + italic publication date on line 2.
 - **Priority flags**: Append country flags (e.g., 🇮🇹 or 🇬🇪) next to the Source Name for priority country stories.
 - List failed feeds at the bottom under ⚠️.
 
-### 6. Offer Deep Dive
-After the digest: *"Want me to fetch the full text of any article? Just say which one."*
-
 ## Environment & Tool Guidelines
-- **RSS Feeds:** Use available RSS/Atom tools (`fetch_feed_entries`, `rss`, etc.).
 - **Twitter/X:** Use `get_user_last_tweets` (1 tweet/call, paginate via `cursor`) or `search_tweets` with `from:USERNAME queryType:Latest` for bulk posts.
+- **RSS Feeds:** Use available RSS/Atom tools (`fetch_feed_entries`, `rss`, etc.).
 - **Article Fetching:** Use page fetch tools (`fetch_article_content`, `fetch`, `browser`) to pull full text when requested.
 - Never run generic page fetches on RSS XML endpoints.
