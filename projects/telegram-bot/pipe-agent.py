@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Telegram Agent Pipe — auto-discovers MCP tools and handles tool execution loop."""
+from __future__ import annotations
 import logging
 import os, json, re
+from typing import Any
 import httpx
 from pydantic import BaseModel, Field
-from openai import AsyncOpenAI
+from openai import AsyncOpenAI  # pyright: ignore[reportMissingImports]
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +31,7 @@ class Pipe:
         MCPO_SEARXNG: str = Field(default="", description="SearXNG mcpo URL")
         MCPO_RSS: str = Field(default="", description="RSS Reader mcpo URL")
         MCPO_TWITTER: str = Field(default="", description="Twitter API mcpo URL")
+        TOKEN_BUDGET: int = Field(default=8000, description="Max cumulative tokens across tool execution loop")
     def __init__(self):
         self.type = "pipe"
         self.id = "telegram-agent"
@@ -95,9 +98,12 @@ class Pipe:
                 result = full_text
             logger.info("Tool %s(%s) => HTTP %s, %d chars (total: %d)", opid, args, r.status_code, len(result), len(full_text))
             return result
+        except httpx.HTTPError as e:
+            logger.error("Tool %s(%s) HTTP error: %s", opid, args, e)
+            return f"Error: tool request failed (HTTP error)"
         except Exception as e:
-            logger.error("Tool %s(%s) failed: %s", opid, args, e)
-            return f"Error: {e}"
+            logger.error("Tool %s(%s) unexpected error: %s", opid, args, e, exc_info=True)
+            return f"Error: tool execution failed unexpectedly"
 
     def _build_tool_tags(self, path_map: dict) -> dict:
         """Build tag_name → opid mapping from discovered tools."""
@@ -187,14 +193,50 @@ class Pipe:
             calls.append({"tool": tag_map[tag], "args": args})
         return calls
 
-    async def pipe(self, body: dict, __user__: dict = None) -> str:
+    @staticmethod
+    def _safe_content(response: Any) -> str:
+        """Extract content from LLM response, returning empty string if choices is empty."""
+        try:
+            choices = getattr(response, 'choices', None)
+            if choices and len(choices) > 0:
+                return choices[0].message.content or ""
+        except Exception:
+            pass
+        return ""
+
+    async def _call_llm(self, api_client: AsyncOpenAI, model: str, messages: list, timeout: float = 60.0, max_retries: int = 2) -> Any:
+        """Call LLM with retry on transient errors (429, 503, connection)."""
+        import asyncio
+        for attempt in range(max_retries + 1):
+            try:
+                return await api_client.chat.completions.create(
+                    model=model, messages=messages, stream=False, timeout=timeout,
+                )
+            except Exception as e:
+                if attempt == max_retries:
+                    raise
+                status = getattr(e, 'status_code', None)
+                if status is None:
+                    resp = getattr(e, 'response', None)
+                    status = getattr(resp, 'status_code', None) if resp else None
+                if status in (429, 503):
+                    delay = 2 ** attempt
+                    logger.warning("LLM call failed with %s (attempt %d/%d), retrying in %ds", status, attempt + 1, max_retries + 1, delay)
+                    await asyncio.sleep(delay)
+                else:
+                    raise
+
+    async def pipe(self, body: dict, __user__: dict | None = None) -> str:
         messages = body.get("messages", [])
         if not messages:
             return "No messages."
 
+        api_key = self.valves.OWUI_API_KEY or os.environ.get("OWUI_API_KEY", "")
+        if not api_key:
+            return "Error: OWUI_API_KEY is not configured. Set it in the pipe valves or OWUI_API_KEY environment variable."
         api_client = AsyncOpenAI(
             base_url=self.valves.OWUI_API_BASE,
-            api_key=self.valves.OWUI_API_KEY or os.environ.get("OWUI_API_KEY", ""),
+            api_key=api_key,
         )
 
         async with httpx.AsyncClient() as http:
@@ -205,11 +247,11 @@ class Pipe:
                 messages = [{"role": "system", "content": sys_prompt}] + list(messages)
             logger.info("Discovered %d tools, %d tags", len(path_map), len(tag_map))
 
-            response = await api_client.chat.completions.create(
-                model=self.valves.BASE_MODEL, messages=messages,
-                stream=False, timeout=60.0,
-            )
-            content = response.choices[0].message.content or ""
+            # Initial LLM call with retry
+            response = await self._call_llm(api_client, self.valves.BASE_MODEL, messages)
+            content = self._safe_content(response)
+            total_tokens = getattr(response.usage, 'total_tokens', 0) if hasattr(response, 'usage') else 0
+            budget = self.valves.TOKEN_BUDGET
 
             max_loops = 5
             while max_loops > 0:
@@ -236,11 +278,21 @@ class Pipe:
                     "Now provide your final answer to the user. Do NOT output any XML or HTML tags."
                 )})
 
-                response = await api_client.chat.completions.create(
-                    model=self.valves.BASE_MODEL, messages=messages,
-                    stream=False, timeout=60.0,
-                )
-                content = response.choices[0].message.content or ""
+                # Trim message history to prevent context overflow (keep system + last 20 messages)
+                if len(messages) > 22:
+                    system_msg = messages[0] if messages[0].get("role") == "system" else None
+                    messages = messages[-20:]
+                    if system_msg and messages[0].get("role") != "system":
+                        messages.insert(0, system_msg)
+
+                response = await self._call_llm(api_client, self.valves.BASE_MODEL, messages)
+                content = self._safe_content(response)
+                if hasattr(response, 'usage'):
+                    total_tokens += getattr(response.usage, 'total_tokens', 0)
+                if total_tokens > budget:
+                    logger.warning("Token budget exceeded (%d > %d) — stopping tool loop", total_tokens, budget)
+                    content += f"\n\n[Token budget of {budget} exceeded. Some tool results may be incomplete.]"
+                    break
 
             # Strip any remaining XML and make one final synthesis call if needed
             if _TEXT_TOOL_RE.search(content) or _SELF_CLOSING_RE.search(content) or _BARE_OPEN_RE.search(content):
@@ -248,10 +300,7 @@ class Pipe:
                 clean = _BARE_OPEN_RE.sub("", _TEXT_TOOL_RE.sub("", _SELF_CLOSING_RE.sub("", content))).strip()
                 messages.append({"role": "assistant", "content": clean})
                 messages.append({"role": "user", "content": "Synthesize the tool results above into a clear final answer. Do NOT use ANY XML tags. Just write the answer in natural language."})
-                response = await api_client.chat.completions.create(
-                    model=self.valves.BASE_MODEL, messages=messages,
-                    stream=False, timeout=60.0,
-                )
-                content = response.choices[0].message.content or ""
+                response = await self._call_llm(api_client, self.valves.BASE_MODEL, messages)
+                content = self._safe_content(response)
 
             return content
